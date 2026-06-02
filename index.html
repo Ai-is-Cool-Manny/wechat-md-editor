@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI is cool. 公众号 Markdown 排版器</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pangu/4.0.7/pangu.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>AI is cool. 排版工作台</h1>
+      <p>本地编辑、实时预览、一键复制到微信公众号后台。</p>
+    </div>
+    <div class="actions">
+      <button id="toggleDraftsButton" type="button">草稿箱</button>
+      <label class="file-button">
+        导入 MD
+        <input id="fileInput" type="file" accept=".md,.markdown,text/markdown,text/plain">
+      </label>
+      <button id="copyButton" type="button">复制富文本</button>
+      <button id="exportButton" type="button">导出 HTML</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="draft-drawer" id="draftDrawer" style="display: none;">
+      <div class="panel-head">
+        <h2>草稿箱</h2>
+        <button id="newDraftButton" type="button" style="height:24px;padding:0 8px;font-size:12px;">新建</button>
+      </div>
+      <ul id="draftList" class="draft-list"></ul>
+    </aside>
+
+    <section class="editor-panel" aria-label="Markdown 编辑区">
+      <div class="panel-head">
+        <h2>Markdown</h2>
+        <span id="stats">0 字</span>
+      </div>
+      <div class="editor-toolbar">
+        <button type="button" data-insert="**文本**">加粗</button>
+        <button type="button" data-insert="[链接描述](https://)">链接</button>
+        <button type="button" data-insert="\n> 引用文本\n">引用</button>
+        <button type="button" data-insert="\n:::cool 提示标题\n提示内容\n:::\n">提示框</button>
+        <button type="button" id="formatPanguButton">一键排版</button>
+      </div>
+      <textarea id="markdownInput" spellcheck="false"></textarea>
+    </section>
+
+    <section class="preview-panel" aria-label="公众号预览区">
+      <div class="panel-head">
+        <h2>公众号预览</h2>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button id="darkModeToggle" type="button" style="height:24px;padding:0 8px;font-size:12px;">深色预览</button>
+          <span id="copyStatus">准备就绪</span>
+        </div>
+      </div>
+      <div class="phone-shell">
+        <section id="preview" class="wechat-article"></section>
+      </div>
+    </section>
+
+    <aside class="settings-panel" aria-label="样式设置">
+      <div class="panel-head">
+        <h2>品牌样式</h2>
+        <button id="resetCssButton" type="button">重置</button>
+      </div>
+
+      <label class="field">
+        <span>主题预设</span>
+        <select id="themePreset">
+          <option value="morandiMist">莫兰迪雾青</option>
+          <option value="morandiSage">莫兰迪鼠尾草</option>
+          <option value="morandiClay">莫兰迪陶土</option>
+          <option value="morandiInk">莫兰迪墨灰</option>
+          <option value="limeGreen">莱姆绿</option>
+          <option value="hermesOrange">爱马仕橙</option>
+          <option value="titianRed">提香红</option>
+          <option value="marrsGreen">马尔斯绿</option>
+          <option value="kleinBlue">克莱因蓝 (高定学术)</option>
+          <option value="veryPeri">长春花蓝 (年度流行)</option>
+          <option value="obsidianBlack">曜石黑 (极简高级)</option>
+          <option value="sunsetYellow">日落黄 (温暖质感)</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>公众号名</span>
+        <input id="brandName" type="text" value="AI is cool.">
+      </label>
+
+      <label class="field">
+        <span>Banner 提示</span>
+        <input id="bannerNote" type="text" value="LOCAL NOTE">
+      </label>
+
+      <label class="field">
+        <span>品牌标语</span>
+        <input id="brandTagline" type="text" value="关于 AI、工具与更好工作的冷静观察。">
+      </label>
+
+      <label class="field">
+        <span>主题色</span>
+        <input id="accentColor" type="color" value="#7895a3">
+      </label>
+
+      <label class="field">
+        <span>正文字号</span>
+        <input id="fontSize" type="range" min="14" max="20" value="16">
+      </label>
+
+      <label class="field">
+        <span>行距</span>
+        <input id="lineHeight" type="range" min="1.6" max="2.2" step="0.05" value="1.9">
+      </label>
+
+      <label class="field grow">
+        <span>自定义 CSS</span>
+        <textarea id="customCss" spellcheck="false"></textarea>
+      </label>
+    </aside>
+  </main>
+
+  <style id="articleTheme"></style>
+  <script src="./app.js"></script>
+</body>
+</html>
