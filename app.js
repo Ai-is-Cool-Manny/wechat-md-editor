@@ -12,6 +12,7 @@ const brandTagline = document.querySelector("#brandTagline");
 const stats = document.querySelector("#stats");
 const copyStatus = document.querySelector("#copyStatus");
 const fileInput = document.querySelector("#fileInput");
+const layoutStyle = document.querySelector("#layoutStyle");
 
 let currentDraftId = localStorage.getItem("wechat-md-current-id") || Date.now().toString();
 
@@ -512,6 +513,11 @@ function renderArticle(markdown) {
   const note = escapeHtml(bannerNote.value || "LOCAL NOTE");
   const tagline = escapeHtml(brandTagline.value || "关于 AI、工具与更好工作的冷静观察。");
   const body = renderMarkdown(markdown);
+
+  if (layoutStyle && layoutStyle.value === "minimal") {
+    return `<section class="article-body">${body}</section>`;
+  }
+
   return `
 <section class="brand-banner">
   <section class="banner-top">
@@ -848,6 +854,7 @@ function updatePreview() {
   localStorage.setItem("wechat-md-font-size", fontSize.value);
   localStorage.setItem("wechat-md-line-height", lineHeight.value);
   localStorage.setItem("wechat-md-preset", themePreset.value);
+  localStorage.setItem("wechat-md-layout", layoutStyle ? layoutStyle.value : "brand");
   localStorage.setItem("wechat-md-brand", brandName.value);
   localStorage.setItem("wechat-md-note", bannerNote.value);
   localStorage.setItem("wechat-md-tagline", brandTagline.value);
@@ -991,6 +998,9 @@ function loadSavedState() {
   const hasKnownPreset = Boolean(savedPreset && themePresets[savedPreset]);
   themePreset.value = hasKnownPreset ? savedPreset : "morandiMist";
   const preset = getPreset();
+  if (layoutStyle) {
+    layoutStyle.value = localStorage.getItem("wechat-md-layout") || "brand";
+  }
   markdownInput.value = localStorage.getItem("wechat-md-content") || sampleMarkdown;
   customCssInput.value = hasKnownPreset ? (localStorage.getItem("wechat-md-css") || preset.css) : preset.css;
   accentColor.value = hasKnownPreset ? (localStorage.getItem("wechat-md-accent") || preset.accent) : preset.accent;
@@ -1032,8 +1042,8 @@ document.querySelector("#resetCssButton").addEventListener("click", () => {
   updatePreview();
 });
 
-[markdownInput, customCssInput, accentColor, fontSize, lineHeight, brandName, bannerNote, brandTagline].forEach((node) => {
-  node.addEventListener("input", updatePreview);
+[markdownInput, customCssInput, accentColor, fontSize, lineHeight, brandName, bannerNote, brandTagline, layoutStyle].forEach((node) => {
+  if (node) node.addEventListener("input", updatePreview);
 });
 
 loadSavedState();
