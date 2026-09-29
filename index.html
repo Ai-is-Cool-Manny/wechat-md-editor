@@ -45,6 +45,7 @@
         <button type="button" data-insert="[链接描述](https://)">链接</button>
         <button type="button" data-insert="\n> 引用文本\n">引用</button>
         <button type="button" data-insert="\n:::cool 提示标题\n提示内容\n:::\n">提示框</button>
+        <button type="button" data-insert="\n:::ref\n参考文献内容\n:::\n">参考文献</button>
         <button type="button" id="formatPanguButton">一键排版</button>
       </div>
       <textarea id="markdownInput" spellcheck="false"></textarea>
@@ -72,6 +73,7 @@
       <label class="field">
         <span>主题预设</span>
         <select id="themePreset">
+          <option value="appleClean">苹果极简白 (Apple Clean)</option>
           <option value="morandiMist">莫兰迪雾青</option>
           <option value="morandiSage">莫兰迪鼠尾草</option>
           <option value="morandiClay">莫兰迪陶土</option>

@@ -104,6 +104,20 @@ console.log(idea);
 `;
 
 const themePresets = {
+  appleClean: {
+    accent: "#0071e3",
+    bg: "#ffffff",
+    ink: "#1d1d1f",
+    muted: "#86868b",
+    soft: "#f5f5f7",
+    line: "#d2d2d7",
+    banner: "linear-gradient(135deg, #ffffff 0%, #fbfbfd 100%)",
+    codeBg: "#1d1d1f",
+    codeText: "#f5f5f7",
+    font: '"SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif',
+    mono: '"SF Mono", "SFMono-Regular", Consolas, Menlo, monospace',
+    css: `.wechat-article h1, .wechat-article h2, .wechat-article h3 { font-weight: 600; letter-spacing: -0.015em; }\n.wechat-article blockquote { background: #fbfbfd; border-left: 3px solid #d2d2d7; }`
+  },
   morandiMist: {
     accent: "#7895a3",
     bg: "#fdfdfb",
@@ -352,6 +366,13 @@ function renderCallout(lines, index) {
   while (cursor < lines.length && !/^:::\s*$/.test(lines[cursor])) {
     body.push(lines[cursor]);
     cursor += 1;
+  }
+
+  if (type === "ref" || type === "reference") {
+    return {
+      html: `<section class="reference-block"><p>${inlineMarkdown(body.join("<br>"))}</p></section>`,
+      next: cursor + 1
+    };
   }
 
   return {
@@ -826,6 +847,20 @@ function buildThemeCss() {
 .callout p {
   margin: 0;
 }
+.reference-block {
+  margin: 22px 0;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: var(--wechat-soft);
+  color: var(--wechat-muted);
+  font-family: "KaiTi", "Kaiti SC", STKaiti, "BiauKai", serif;
+  font-size: 0.85em;
+  line-height: 1.65;
+}
+.reference-block p {
+  margin: 0 !important;
+  text-align: left !important;
+}
 .brand-footer {
   margin: 30px 22px 0;
   padding: 20px 0 26px;
@@ -1089,6 +1124,8 @@ document.querySelectorAll(".editor-toolbar button[data-insert]").forEach(btn => 
         replacement = template.replace("引用文本", selectedText);
       } else if (template.includes("提示内容")) {
         replacement = template.replace("提示内容", selectedText);
+      } else if (template.includes("参考文献内容")) {
+        replacement = template.replace("参考文献内容", selectedText);
       }
     }
 
