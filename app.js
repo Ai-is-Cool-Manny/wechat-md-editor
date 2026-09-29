@@ -611,7 +611,7 @@ function buildThemeCss() {
 }
 .brand-banner {
   margin: 0 0 28px;
-  padding: 24px 22px 22px;
+  padding: 24px 16px 22px;
   border-bottom: 1px solid var(--wechat-line);
   background: var(--wechat-banner);
 }
@@ -669,7 +669,7 @@ function buildThemeCss() {
   font-weight: 700;
 }
 .article-body {
-  padding: 0 22px 10px;
+  padding: 0 16px 10px;
 }
 .wechat-article h1 {
   margin: 0 0 24px;
@@ -881,7 +881,7 @@ function buildThemeCss() {
   margin-bottom: 0 !important;
 }
 .brand-footer {
-  margin: 30px 22px 0;
+  margin: 30px 16px 0;
   padding: 20px 0 26px;
   border-top: 1px solid var(--wechat-line);
   color: var(--wechat-muted);
