@@ -369,8 +369,24 @@ function renderCallout(lines, index) {
   }
 
   if (type === "ref" || type === "reference") {
+    const paras = [];
+    let currentPara = [];
+    for (const line of body) {
+      if (!line.trim()) {
+        if (currentPara.length > 0) {
+          paras.push(`<p>${currentPara.join("<br>")}</p>`);
+          currentPara = [];
+        }
+      } else {
+        currentPara.push(inlineMarkdown(line.trim()));
+      }
+    }
+    if (currentPara.length > 0) {
+      paras.push(`<p>${currentPara.join("<br>")}</p>`);
+    }
+
     return {
-      html: `<section class="reference-block"><p>${inlineMarkdown(body.join("<br>"))}</p></section>`,
+      html: `<section class="reference-block">${paras.join("")}</section>`,
       next: cursor + 1
     };
   }
@@ -858,8 +874,11 @@ function buildThemeCss() {
   line-height: 1.65;
 }
 .reference-block p {
-  margin: 0 !important;
+  margin: 0 0 10px !important;
   text-align: left !important;
+}
+.reference-block p:last-child {
+  margin-bottom: 0 !important;
 }
 .brand-footer {
   margin: 30px 22px 0;
