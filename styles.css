@@ -447,53 +447,93 @@ body {
 
 .phone-stage {
   flex: 1;
-  overflow-y: auto;
+  overflow: hidden;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 22px 14px 34px;
-  background: radial-gradient(circle at 50% 15%, #ffffff 0%, #ebeef2 100%);
+  align-items: center;
+  padding: 16px;
+  background: #f5f6f8;
 }
 
-/* 拟真 iPhone 15 钛金属微质感机身 */
-.iphone-bezel {
+/* 现代化极简设备方框画板 (取代笨重的黑色塑料假边框，空间利用率大幅提升) */
+.preview-canvas-card {
   width: 100%;
-  max-width: 416px;
-  background: #1c1c1e;
-  padding: 12px 10px 14px;
-  border-radius: 46px;
-  box-shadow: var(--apple-shadow-phone), 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 0 0 3px #2c2c2e;
-  position: relative;
-  transition: all 0.25s ease;
-}
-
-.dynamic-island {
-  width: 84px;
-  height: 20px;
-  background: #000000;
-  border-radius: 20px;
-  margin: 0 auto 9px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.phone-shell {
-  max-height: 720px;
-  border-radius: 34px;
-  overflow-y: auto;
+  max-width: 414px;
+  height: 100%;
+  max-height: 860px;
   background: #ffffff;
-  padding: 16px 8px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 32px -4px rgba(0, 0, 0, 0.08), 0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
 }
 
-.home-indicator {
-  width: 120px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.35);
-  border-radius: 2px;
-  margin: 10px auto 0;
+.canvas-header {
+  height: 36px;
+  min-height: 36px;
+  background: #fbfbfd;
+  border-bottom: 1px solid #eeeff2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  user-select: none;
+}
+
+.canvas-header-left .canvas-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8e8e93;
+  letter-spacing: -0.01em;
+}
+
+.canvas-header-center .canvas-title {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #3a3a3c;
+}
+
+.canvas-header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #8e8e93;
+}
+
+.canvas-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34c759;
+}
+
+.preview-scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #ffffff;
+  padding: 18px 8px 36px;
+}
+
+.preview-scroll-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.preview-scroll-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.preview-scroll-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.preview-scroll-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .wechat-article {
@@ -504,11 +544,28 @@ body {
   padding: 0 4px;
 }
 
+/* 深色模式适配 */
+.preview-canvas-card.dark-preview,
 .phone-shell.dark-preview {
-  background: #121212;
+  background: #18181a;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
-.phone-shell.dark-preview .wechat-article {
+.preview-canvas-card.dark-preview .canvas-header {
+  background: #202022;
+  border-bottom-color: #2c2c2e;
+}
+
+.preview-canvas-card.dark-preview .canvas-header-center .canvas-title {
+  color: #e5e5ea;
+}
+
+.preview-canvas-card.dark-preview .preview-scroll-body {
+  background: #18181a;
+}
+
+.preview-canvas-card.dark-preview .wechat-article {
   background: #191919;
   color: #d1d1d1;
   --wechat-ink: #d1d1d1;

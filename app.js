@@ -1468,25 +1468,19 @@ document.querySelector("#resetCssButton").addEventListener("click", () => {
 loadSavedState();
 updatePreview();
 
-// UI Interactivity
+// UI 交互控制
 const phoneShell = document.querySelector(".phone-shell");
+const previewCanvasCard = document.querySelector("#previewCanvasCard");
 
-markdownInput.addEventListener("scroll", () => {
-  const scrollPercentage = markdownInput.scrollTop / (markdownInput.scrollHeight - markdownInput.clientHeight);
-  if (!isNaN(scrollPercentage)) {
-    phoneShell.scrollTop = scrollPercentage * (phoneShell.scrollHeight - phoneShell.clientHeight);
-  }
-});
+// 左右面板滚动完全独立，互不干扰联动（提升编辑专注度）
 
 const darkModeToggle = document.querySelector("#darkModeToggle");
 if (darkModeToggle) {
   darkModeToggle.addEventListener("click", () => {
-    phoneShell.classList.toggle("dark-preview");
-    if (phoneShell.classList.contains("dark-preview")) {
-      darkModeToggle.textContent = "浅色预览";
-    } else {
-      darkModeToggle.textContent = "深色预览";
-    }
+    if (phoneShell) phoneShell.classList.toggle("dark-preview");
+    if (previewCanvasCard) previewCanvasCard.classList.toggle("dark-preview");
+    const isDark = (previewCanvasCard && previewCanvasCard.classList.contains("dark-preview")) || (phoneShell && phoneShell.classList.contains("dark-preview"));
+    darkModeToggle.textContent = isDark ? "浅色" : "深色";
   });
 }
 
@@ -1590,7 +1584,25 @@ const viewportSelect = document.querySelector("#viewportSelect");
 if (viewportSelect) {
   viewportSelect.addEventListener("change", () => {
     const val = viewportSelect.value;
-    preview.style.maxWidth = val;
+    const card = document.querySelector("#previewCanvasCard");
+    const article = document.querySelector("#preview");
+    const badge = document.querySelector("#previewDeviceBadge");
+
+    if (val === "100%") {
+      if (card) {
+        card.style.maxWidth = "100%";
+        card.style.borderRadius = "12px";
+      }
+      if (article) article.style.maxWidth = "100%";
+    } else {
+      if (card) {
+        card.style.maxWidth = `calc(${val} + 24px)`;
+        card.style.borderRadius = "16px";
+      }
+      if (article) article.style.maxWidth = val;
+    }
+
+    if (badge) badge.textContent = viewportSelect.options[viewportSelect.selectedIndex].text;
     setStatus(`已切换至视口：${viewportSelect.options[viewportSelect.selectedIndex].text}`);
   });
 }

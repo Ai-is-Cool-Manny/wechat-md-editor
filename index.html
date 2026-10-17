@@ -113,13 +113,12 @@
       <div class="panel-head">
         <div class="panel-title-group">
           <h2>公众号预览</h2>
-          <span class="preview-device-badge">iPhone 15</span>
+          <span class="preview-device-badge" id="previewDeviceBadge">390px 移动视口</span>
         </div>
         <div class="preview-controls">
           <select id="viewportSelect" class="apple-select-compact">
-            <option value="390px">iPhone 14/15 (390px)</option>
-            <option value="375px">标准屏 (375px)</option>
-            <option value="428px">Plus/Max (428px)</option>
+            <option value="390px" selected>移动端标准 (390px)</option>
+            <option value="430px">大屏视口 (430px)</option>
             <option value="100%">平铺全宽 (100%)</option>
           </select>
           <button id="qrcodeToggle" type="button" class="btn-apple btn-xs" title="手机扫码在真机上体验排版效果">📱 扫码</button>
@@ -129,12 +128,22 @@
       </div>
 
       <div class="phone-stage">
-        <div class="iphone-bezel">
-          <div class="dynamic-island"></div>
-          <div class="phone-shell">
+        <div class="preview-canvas-card" id="previewCanvasCard">
+          <div class="canvas-header">
+            <div class="canvas-header-left">
+              <span class="canvas-time">9:41</span>
+            </div>
+            <div class="canvas-header-center">
+              <span class="canvas-title">微信公众号正文</span>
+            </div>
+            <div class="canvas-header-right">
+              <span class="canvas-status-dot"></span>
+              <span class="canvas-battery">100%</span>
+            </div>
+          </div>
+          <div class="preview-scroll-body phone-shell" id="previewScrollBody">
             <section id="preview" class="wechat-article"></section>
           </div>
-          <div class="home-indicator"></div>
         </div>
       </div>
     </section>
