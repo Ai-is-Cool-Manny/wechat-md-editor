@@ -392,7 +392,10 @@ function escapeHtml(value) {
 
 function inlineMarkdown(value) {
   let text = escapeHtml(value);
-  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<figure><img src="$2" alt="$1"><figcaption>$1</figcaption></figure>');
+  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+    const captionHtml = alt ? `<figcaption style="margin-top: 8px; text-align: center; color: #888888; font-size: 13px; line-height: 1.4;">${alt}</figcaption>` : "";
+    return `<figure style="margin: 22px 0; text-align: center;"><img src="${src}" alt="${alt}" style="max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 6px; box-sizing: border-box;">${captionHtml}</figure>`;
+  });
   text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
   text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
   text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
@@ -689,7 +692,12 @@ function renderMarkdown(markdown) {
       paragraph.push(lines[i].trim());
       i += 1;
     }
-    html.push(`<p>${inlineMarkdown(paragraph.join(" "))}</p>`);
+    const content = inlineMarkdown(paragraph.join(" "));
+    if (content.startsWith("<figure") && content.endsWith("</figure>")) {
+      html.push(content);
+    } else {
+      html.push(`<p>${content}</p>`);
+    }
   }
 
   return html.join("\n");
@@ -1767,5 +1775,130 @@ if (stats) {
     alert(`📊 文章字数与阅读时长数据看板：\n\n• 中文字数：${s.chineseChars.toLocaleString()} 字\n• 英文/数字：${s.englishWords.toLocaleString()} 词\n• 合计字数：${s.totalWords.toLocaleString()} 字\n• 总字符数（不含空格）：${s.totalChars.toLocaleString()} 字符\n• 预计阅读时长：约 ${s.readMinutes} 分钟（基于 380字/分钟 均速）\n• 本地状态：实时自动保存中`);
   });
 }
+
+// 本地图片插入与尺寸优化 (支持剪贴板 Ctrl+V 粘贴、拖拽 Drag & Drop、文件选择)
+function processImageFile(file, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    // GIF 不压缩保持动态帧；小于 600KB 直接使用原图
+    if (file.type === "image/gif" || file.size < 600 * 1024) {
+      callback(dataUrl, file.name);
+      return;
+    }
+    // 对较大图片使用 Canvas 进行平滑尺寸优化（宽度限制 1280px，微信最佳尺寸）
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 1280;
+      let w = img.width;
+      let h = img.height;
+      if (w > maxW) {
+        h = Math.round((h * maxW) / w);
+        w = maxW;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, w, h);
+      const isPng = file.type === "image/png";
+      const mime = isPng ? "image/png" : "image/jpeg";
+      const quality = isPng ? undefined : 0.88;
+      const optimizedUrl = canvas.toDataURL(mime, quality);
+      callback(optimizedUrl, file.name);
+    };
+    img.onerror = () => callback(dataUrl, file.name);
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleImageInsertion(files) {
+  if (!files || files.length === 0) return;
+  const imageFiles = Array.from(files).filter(f => f.type && f.type.startsWith("image/"));
+  if (imageFiles.length === 0) return;
+
+  setStatus(`正在处理 ${imageFiles.length} 张本地图片...`);
+
+  let processedCount = 0;
+  const imageMarkdownList = [];
+
+  imageFiles.forEach((file, index) => {
+    processImageFile(file, (dataUrl, fileName) => {
+      const altText = fileName ? fileName.replace(/\.[^/.]+$/, "").slice(0, 30) : "图片";
+      imageMarkdownList[index] = `\n\n![${altText}](${dataUrl})\n\n`;
+      processedCount++;
+
+      if (processedCount === imageFiles.length) {
+        const insertText = imageMarkdownList.join("");
+        const start = markdownInput.selectionStart;
+        const end = markdownInput.selectionEnd;
+        const current = markdownInput.value;
+
+        markdownInput.value = current.substring(0, start) + insertText + current.substring(end);
+        markdownInput.focus();
+        markdownInput.selectionStart = markdownInput.selectionEnd = start + insertText.length;
+        updatePreview();
+        setStatus(`已成功插入 ${imageFiles.length} 张本地图片（复制到公众号自动转存）`);
+      }
+    });
+  });
+}
+
+// 1. 剪贴板截图 Ctrl+V 粘贴图片
+markdownInput.addEventListener("paste", (e) => {
+  const items = e.clipboardData && e.clipboardData.items;
+  if (!items) return;
+
+  const imageFiles = [];
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type && items[i].type.indexOf("image") !== -1) {
+      const file = items[i].getAsFile();
+      if (file) imageFiles.push(file);
+    }
+  }
+
+  if (imageFiles.length > 0) {
+    e.preventDefault();
+    handleImageInsertion(imageFiles);
+  }
+});
+
+// 2. 本地图片拖拽 Drag & Drop
+['dragenter', 'dragover'].forEach(eventName => {
+  markdownInput.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    markdownInput.classList.add("drag-over");
+  });
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  markdownInput.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    markdownInput.classList.remove("drag-over");
+  });
+});
+
+markdownInput.addEventListener("drop", (e) => {
+  e.preventDefault();
+  const files = e.dataTransfer && e.dataTransfer.files;
+  if (files && files.length > 0) {
+    handleImageInsertion(files);
+  }
+});
+
+// 3. 工具栏点击选择本地图片文件
+const imageFileInput = document.querySelector("#imageFileInput");
+if (imageFileInput) {
+  imageFileInput.addEventListener("change", () => {
+    if (imageFileInput.files && imageFileInput.files.length > 0) {
+      handleImageInsertion(imageFileInput.files);
+      imageFileInput.value = "";
+    }
+  });
+}
+
 
 

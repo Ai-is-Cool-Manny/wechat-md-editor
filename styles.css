@@ -254,11 +254,32 @@ button:active,
   gap: 8px;
   flex-wrap: wrap;
 }
-.editor-toolbar button {
+.editor-toolbar button,
+.toolbar-file-button {
   height: 28px;
   padding: 0 10px;
   font-size: 12px;
   background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+.toolbar-file-button:hover,
+.editor-toolbar button:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+#markdownInput.drag-over {
+  outline: 2px dashed var(--accent);
+  background-color: #f8fafc;
 }
 
 .draft-drawer {
