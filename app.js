@@ -1776,8 +1776,25 @@ if (stats) {
   });
 }
 
-// 本地图片插入与尺寸优化 (支持剪贴板 Ctrl+V 粘贴、拖拽 Drag & Drop、文件选择)
-function processImageFile(file, callback) {
+// 本地图片插入与尺寸优化 (优先上传 Cloudflare R2 免费图床，未绑定时自动优雅降级为本地 Base64)
+async function processImageFile(file, callback) {
+  // 1. 尝试上传至 Cloudflare R2 免费对象存储
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.url) {
+        callback(data.url, file.name);
+        return;
+      }
+    }
+  } catch (e) {
+    // 忽略错误，平滑降级
+  }
+
+  // 2. 降级方案：本地智能 Canvas 尺寸优化 (微信后台自动转存)
   const reader = new FileReader();
   reader.onload = (e) => {
     const dataUrl = e.target.result;
