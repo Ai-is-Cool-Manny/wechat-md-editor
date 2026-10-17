@@ -1776,8 +1776,25 @@ if (stats) {
   });
 }
 
-// 本地图片插入与尺寸优化 (支持剪贴板 Ctrl+V 粘贴、拖拽 Drag & Drop、文件选择)
-function processImageFile(file, callback) {
+// 本地图片插入与尺寸优化 (优先上传 Cloudflare R2 免费图床，失败自动降级为本地 Base64)
+async function processImageFile(file, callback) {
+  // 1. 尝试上传至 Cloudflare R2 对象存储 (免流量费全球永久图床)
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.url) {
+        callback(data.url, file.name);
+        return;
+      }
+    }
+  } catch (e) {
+    // 忽略错误，自动平滑降级至本地 Canvas 优化 Base64
+  }
+
+  // 2. 降级方案：本地智能 Canvas 优化 DataURL (微信后台自动转存)
   const reader = new FileReader();
   reader.onload = (e) => {
     const dataUrl = e.target.result;
@@ -1899,6 +1916,133 @@ if (imageFileInput) {
     }
   });
 }
+
+// ==========================================================================
+// 4. Cloudflare Workers AI 创作助手逻辑
+// ==========================================================================
+const toggleAiButton = document.querySelector("#toggleAiButton");
+const aiModal = document.querySelector("#aiModal");
+const closeAiModal = document.querySelector("#closeAiModal");
+const aiChips = document.querySelectorAll(".ai-chip");
+const aiInputText = document.querySelector("#aiInputText");
+const aiSubmitButton = document.querySelector("#aiSubmitButton");
+const aiLoadingStatus = document.querySelector("#aiLoadingStatus");
+const aiResultArea = document.querySelector("#aiResultArea");
+const aiResultContent = document.querySelector("#aiResultContent");
+const aiInsertToDoc = document.querySelector("#aiInsertToDoc");
+const aiCopyResult = document.querySelector("#aiCopyResult");
+
+let currentAiType = "polish";
+
+function openAiModal() {
+  if (!aiModal) return;
+  // 如果编辑区有选中文本，自动带入输入框
+  const start = markdownInput.selectionStart;
+  const end = markdownInput.selectionEnd;
+  const sel = markdownInput.value.substring(start, end).trim();
+  if (sel && aiInputText) {
+    aiInputText.value = sel;
+  }
+  aiModal.style.display = "flex";
+  if (aiInputText) aiInputText.focus();
+}
+
+function hideAiModal() {
+  if (aiModal) aiModal.style.display = "none";
+}
+
+if (toggleAiButton) toggleAiButton.addEventListener("click", openAiModal);
+if (closeAiModal) closeAiModal.addEventListener("click", hideAiModal);
+if (aiModal) {
+  aiModal.addEventListener("click", (e) => {
+    if (e.target === aiModal) hideAiModal();
+  });
+}
+
+aiChips.forEach(chip => {
+  chip.addEventListener("click", () => {
+    aiChips.forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    currentAiType = chip.getAttribute("data-ai-type");
+    if (aiInputText.value.trim()) {
+      handleAiRequest();
+    } else {
+      aiInputText.focus();
+    }
+  });
+});
+
+async function handleAiRequest() {
+  const content = aiInputText.value.trim();
+  if (!content) {
+    alert("请先输入或选择需要让 AI 处理的文字内容！");
+    aiInputText.focus();
+    return;
+  }
+
+  aiLoadingStatus.style.display = "inline-block";
+  aiSubmitButton.disabled = true;
+  aiSubmitButton.style.opacity = "0.6";
+
+  try {
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: currentAiType,
+        content: content
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) {
+      aiResultContent.textContent = `💡 提示：${data.error}\n\n（若尚未在 Cloudflare 后台绑定 Workers AI，请前往 Cloudflare Pages 控制台 -> Settings -> Functions -> Workers AI 绑定 'AI' 变量即可开启）`;
+    } else {
+      aiResultContent.textContent = data.result || "未返回结果";
+    }
+    aiResultArea.style.display = "flex";
+  } catch (err) {
+    aiResultContent.textContent = `请求失败: ${err.message}`;
+    aiResultArea.style.display = "flex";
+  } finally {
+    aiLoadingStatus.style.display = "none";
+    aiSubmitButton.disabled = false;
+    aiSubmitButton.style.opacity = "1";
+  }
+}
+
+if (aiSubmitButton) aiSubmitButton.addEventListener("click", handleAiRequest);
+
+if (aiInsertToDoc) {
+  aiInsertToDoc.addEventListener("click", () => {
+    const textToInsert = aiResultContent.textContent;
+    if (!textToInsert) return;
+
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const current = markdownInput.value;
+
+    markdownInput.value = current.substring(0, start) + "\n\n" + textToInsert + "\n\n" + current.substring(end);
+    markdownInput.focus();
+    markdownInput.selectionStart = markdownInput.selectionEnd = start + textToInsert.length + 4;
+    updatePreview();
+    hideAiModal();
+    setStatus("已将 AI 生成内容插入到文章中");
+  });
+}
+
+if (aiCopyResult) {
+  aiCopyResult.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(aiResultContent.textContent);
+      aiCopyResult.textContent = "已复制！";
+      setTimeout(() => { aiCopyResult.textContent = "复制"; }, 1800);
+    } catch (e) {
+      prompt("请手动复制：", aiResultContent.textContent);
+    }
+  });
+}
+
 
 
 

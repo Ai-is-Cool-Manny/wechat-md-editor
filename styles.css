@@ -981,3 +981,202 @@ body {
     padding: 12px;
   }
 }
+
+/* ==========================================================================
+   10. Cloudflare Workers AI 创作助手弹窗
+   ========================================================================== */
+.btn-ai-gradient {
+  background: linear-gradient(135deg, #f0f7ff 0%, #f5f3ff 100%);
+  border: 1px solid rgba(147, 51, 234, 0.25);
+  color: #7c3aed;
+  font-weight: 600;
+}
+.btn-ai-gradient:hover {
+  background: linear-gradient(135deg, #e0f0fe 0%, #ede9fe 100%);
+  border-color: rgba(147, 51, 234, 0.4);
+  color: #6d28d9;
+}
+.ai-sparkle {
+  color: #8b5cf6;
+  font-size: 13px;
+}
+
+.ai-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.ai-modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  width: min(92vw, 540px);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.35);
+  animation: qrModalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.ai-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--apple-subtle-border);
+  padding-bottom: 12px;
+}
+
+.ai-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-modal-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--apple-text);
+}
+
+.ai-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #ede9fe;
+  color: #6d28d9;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.ai-modal-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--apple-secondary);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.ai-modal-body {
+  overflow-y: auto;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-tip {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--apple-secondary);
+}
+
+.ai-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-chip {
+  height: 28px;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #f5f6f8;
+  color: #2c2c2e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ai-chip:hover, .ai-chip.active {
+  background: #ede9fe;
+  border-color: rgba(147, 51, 234, 0.3);
+  color: #6d28d9;
+}
+
+.ai-input-wrapper textarea {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  font: 13.5px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  color: #1d1d1f;
+  resize: vertical;
+  outline: none;
+  background: #fafbfc;
+  transition: all 0.15s ease;
+}
+
+.ai-input-wrapper textarea:focus {
+  background: #ffffff;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+.ai-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-loading-text {
+  font-size: 12.5px;
+  color: #7c3aed;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.ai-result-card {
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.ai-result-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.ai-result-content {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #1e293b;
+  white-space: pre-wrap;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+

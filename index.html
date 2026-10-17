@@ -24,6 +24,10 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
         草稿箱
       </button>
+      <button id="toggleAiButton" type="button" class="btn-apple btn-ai-gradient" title="打开 Cloudflare Workers AI 创作与润色助手">
+        <span class="ai-sparkle">✨</span>
+        AI 助手
+      </button>
       <div class="btn-segmented">
         <label class="file-button btn-apple" title="导入本地 Markdown 文件">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -236,6 +240,47 @@
         <div id="qrcodeContainer" class="qrcode-wrapper"></div>
         <p id="qrUrlText" class="qr-url-text"></p>
         <button id="copyUrlButton" type="button" class="qr-copy-btn">复制真机预览链接</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cloudflare Workers AI 创作助手弹窗 -->
+  <div id="aiModal" class="ai-modal-overlay" style="display: none;">
+    <div class="ai-modal-card">
+      <div class="ai-modal-header">
+        <div class="ai-modal-title">
+          <span class="ai-badge">Workers AI</span>
+          <h3>AI 深度写作助手</h3>
+        </div>
+        <button id="closeAiModal" type="button" class="ai-modal-close" aria-label="关闭">&times;</button>
+      </div>
+      <div class="ai-modal-body">
+        <p class="ai-tip">选中文中文字后点击下方功能，或直接在框内输入您的创作需求：</p>
+        <div class="ai-quick-actions">
+          <button type="button" class="ai-chip" data-ai-type="polish">✨ 晚点特稿润色</button>
+          <button type="button" class="ai-chip" data-ai-type="quote">💎 提炼金句卡片</button>
+          <button type="button" class="ai-chip" data-ai-type="title">🎯 爆款特稿标题</button>
+          <button type="button" class="ai-chip" data-ai-type="outline">📋 深度大纲梳理</button>
+        </div>
+        <div class="ai-input-wrapper">
+          <textarea id="aiInputText" placeholder="在此输入需要处理的内容（或选中编辑区文字后点击上方快捷功能）..." rows="3"></textarea>
+        </div>
+        <div class="ai-actions-row">
+          <button id="aiSubmitButton" type="button" class="btn-apple btn-primary">
+            <span>开始处理</span>
+          </button>
+          <span id="aiLoadingStatus" class="ai-loading-text" style="display: none;">AI 正在深度思考中...</span>
+        </div>
+        <div id="aiResultArea" class="ai-result-card" style="display: none;">
+          <div class="ai-result-header">
+            <span>AI 生成结果：</span>
+            <div class="ai-result-btns">
+              <button id="aiInsertToDoc" type="button" class="btn-apple btn-xs">插入到文章</button>
+              <button id="aiCopyResult" type="button" class="btn-apple btn-xs">复制</button>
+            </div>
+          </div>
+          <div id="aiResultContent" class="ai-result-content"></div>
+        </div>
       </div>
     </div>
   </div>
