@@ -460,3 +460,38 @@ button:active,
   letter-spacing: 0;
 }
 
+/* 标题前缀红色方块（横向长方形，1-4级递减） */
+.heading-block {
+  display: inline-block;
+  vertical-align: middle;
+  background-color: #ee0000;
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+}
+.heading-h1-block {
+  width: 24px;
+  height: 11px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+.heading-h2-block {
+  width: 16px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+.heading-h3-block {
+  width: 10px;
+  height: 9px;
+  border-radius: 1px;
+  margin-right: 7px;
+}
+.heading-h4-block {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  margin-right: 6px;
+}
+
+

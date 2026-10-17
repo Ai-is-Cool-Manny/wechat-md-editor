@@ -103,7 +103,7 @@ console.log(idea);
 酷不是炫技，酷是一个东西真的让生活变轻了一点。
 `;
 
-const latepostSampleMarkdown = `# 独家对话美的方洪波：我只是一个过客，不需要被任何人记住
+const latepostSampleMarkdown = `# 01 / 痛点剖析：停留在任务交差层面的“浅层AI”
 
 :::card 美的集团董事长 方洪波
 “企业想要生生不息，依靠的是完善的公司治理，而不是一个人。”
@@ -117,7 +117,7 @@ const latepostSampleMarkdown = `# 独家对话美的方洪波：我只是一个�
 
 正是这名过客，创造了中国商业史上罕见的增长奇迹。在他接任美的董事长这十三年，美的收入增长了 4 倍，从 1000 亿到 4000 亿；市值翻了 8 倍，上涨了超过 5000 亿。
 
-## 我不加班，也不鼓励员工加班
+## 二级分节：我不加班，也不鼓励员工加班
 
 晚点：那个时候含金量很高是吧？
 
@@ -127,11 +127,15 @@ const latepostSampleMarkdown = `# 独家对话美的方洪波：我只是一个�
 
 方洪波：摸着发达国家企业的发展经验过河。美的今天做的没有新鲜事，都是从发达国家的跨国企业经历过的事情中总结出来的。常识是跨越时间、空间，被检验证明不会变的。
 
-## 混乱是阶梯，美的的两次关键转型
+### 三级要点：混乱是阶梯，美的的两次关键转型
 
 晚点：新时代的秩序、规则和底层技术都在动态变化，那老公司的护城河到底是什么？
 
-方洪波：它在不断的动态变化当中。过去 10 年美的护城河是效率。我们的现金周期是负的，家电行业里我估计目前只有美的实现了——我们做生意，不用自己拿本钱，都是用别人的钱在做生意。我们去年现金周期是 -9 天——这就是我的护城河，但这个护城河在不断地被侵蚀。
+方洪波：它在不断的动态变化当中。过去 10 年美的护城河是效率。我们的现金周期是负的，家电行业里我估计目前只有美的实现了——我们做生意，不用自己拿本钱，都是用别人的钱在做生意。
+
+#### 四级注释：关于现金流周期的细化指标
+
+对企业来说，效率就是“减少一分钱的占用”。把每一个多余的一分钱都纳入战略框架，这就是效率。
 
 题图来源：美的集团
 
@@ -152,9 +156,15 @@ const themePresets = {
     font: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
     mono: 'Consolas, "SFMono-Regular", Menlo, monospace',
     css: `.wechat-article { font-size: 15px; line-height: 1.75; letter-spacing: 0.8px; color: #000000; text-align: justify; }
-.wechat-article h1 { font-size: 24px; line-height: 1.35; font-weight: 700; letter-spacing: 0.5px; margin: 0 0 20px; color: #000000; }
-.wechat-article h2 { font-size: 20px; line-height: 1.25; font-weight: 700; letter-spacing: 0.5px; margin: 36px 0 16px; color: #000000; }
-.wechat-article h3 { font-size: 17px; line-height: 1.35; font-weight: 700; margin: 26px 0 12px; color: #000000; }
+.wechat-article h1 { font-size: 22px; line-height: 1.4; font-weight: 700; letter-spacing: 0.5px; margin: 32px 0 16px; color: #000000; }
+.wechat-article h2 { font-size: 19px; line-height: 1.4; font-weight: 700; letter-spacing: 0.5px; margin: 28px 0 14px; color: #000000; }
+.wechat-article h3 { font-size: 17px; line-height: 1.4; font-weight: 700; margin: 24px 0 12px; color: #000000; }
+.wechat-article h4 { font-size: 15px; line-height: 1.4; font-weight: 700; margin: 20px 0 10px; color: #000000; }
+.heading-block { display: inline-block; vertical-align: middle; background-color: #ee0000; overflow: hidden; font-size: 0; line-height: 0; }
+.heading-h1-block { width: 24px; height: 11px; border-radius: 2px; margin-right: 8px; }
+.heading-h2-block { width: 16px; height: 10px; border-radius: 2px; margin-right: 8px; }
+.heading-h3-block { width: 10px; height: 9px; border-radius: 1px; margin-right: 7px; }
+.heading-h4-block { width: 6px; height: 6px; border-radius: 1px; margin-right: 6px; }
 .wechat-article p { margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify; color: #000000; }
 .wechat-article blockquote { margin: 20px 0; padding: 12px 16px; border-left: 3px solid #ee0000; background: #fbfbfb; color: #333333; }`
   },
@@ -546,12 +556,20 @@ function renderMarkdown(markdown) {
       const level = heading[1].length;
       const title = inlineMarkdown(heading[2].trim());
       const isLatepost = themePreset.value === "latepost";
+      const blockColor = isLatepost ? "#ee0000" : (accentColor.value || "#0071e3");
+
       if (level === 1) {
-        html.push(isLatepost ? `<h1><span>${title}</span></h1>` : `<h1><span>${title}</span><i></i></h1>`);
+        // 一级标题：横向长方形红色色块（24px宽，11px高）
+        html.push(`<h1><span class="heading-block heading-h1-block" style="display:inline-block;width:24px;height:11px;background-color:${blockColor};vertical-align:middle;margin-right:8px;border-radius:2px;font-size:0;line-height:0;overflow:hidden;">&nbsp;</span><span style="vertical-align:middle;">${title}</span></h1>`);
       } else if (level === 2) {
-        html.push(isLatepost ? `<h2><span>${title}</span></h2>` : `<h2><b>AI</b><span>${title}</span></h2>`);
+        // 二级标题：比一级短一点的红色色块（16px宽，10px高）
+        html.push(`<h2><span class="heading-block heading-h2-block" style="display:inline-block;width:16px;height:10px;background-color:${blockColor};vertical-align:middle;margin-right:8px;border-radius:2px;font-size:0;line-height:0;overflow:hidden;">&nbsp;</span><span style="vertical-align:middle;">${title}</span></h2>`);
       } else if (level === 3) {
-        html.push(isLatepost ? `<h3><span>${title}</span></h3>` : `<h3><b></b><span>${title}</span></h3>`);
+        // 三级标题：更短的红色小色块（10px宽，9px高）
+        html.push(`<h3><span class="heading-block heading-h3-block" style="display:inline-block;width:10px;height:9px;background-color:${blockColor};vertical-align:middle;margin-right:7px;border-radius:1px;font-size:0;line-height:0;overflow:hidden;">&nbsp;</span><span style="vertical-align:middle;">${title}</span></h3>`);
+      } else if (level === 4) {
+        // 四级标题：微型红色小方块（6px宽，6px高）
+        html.push(`<h4><span class="heading-block heading-h4-block" style="display:inline-block;width:6px;height:6px;background-color:${blockColor};vertical-align:middle;margin-right:6px;border-radius:1px;font-size:0;line-height:0;overflow:hidden;">&nbsp;</span><span style="vertical-align:middle;">${title}</span></h4>`);
       } else {
         html.push(`<h${level}>${title}</h${level}>`);
       }
@@ -802,53 +820,68 @@ function buildThemeCss() {
   border-radius: 99px;
   background: var(--wechat-accent);
   font-style: normal;
+.wechat-article h1 {
+  margin: 32px 0 16px;
+  color: var(--wechat-ink);
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 700;
 }
 .wechat-article h2 {
-  display: block;
-  margin: 36px 0 16px;
-  padding: 0;
+  margin: 28px 0 14px;
   color: var(--wechat-ink);
-  font-size: 20px;
-  line-height: 1.45;
-  font-weight: 800;
-}
-.wechat-article h2 b {
-  display: inline-block;
-  margin: 0 8px 0 0;
-  padding: 2px 7px;
-  border: 1px solid var(--wechat-accent);
-  border-radius: 999px;
-  color: var(--wechat-accent);
-  font-size: 11px;
-  line-height: 1.35;
-  font-weight: 900;
-}
-.wechat-article h2 span {
-  display: inline;
+  font-size: 19px;
+  line-height: 1.4;
+  font-weight: 700;
 }
 .wechat-article h3 {
-  display: block;
-  margin: 28px 0 12px;
+  margin: 24px 0 12px;
   color: var(--wechat-ink);
-  font-size: 18px;
-  line-height: 1.45;
-  font-weight: 800;
-}
-.wechat-article h3 b {
-  display: inline-block;
-  margin: 0 8px 0 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--wechat-accent);
-}
-.wechat-article h3 span {
-  display: inline;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 700;
 }
 .wechat-article h4,
 .wechat-article h5,
 .wechat-article h6 {
-  margin: 22px 0 10px;
+  margin: 20px 0 10px;
+  color: var(--wechat-ink);
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+.heading-block {
+  display: inline-block;
+  vertical-align: middle;
+  background-color: var(--wechat-accent);
+  overflow: hidden;
+  font-size: 0;
+  line-height: 0;
+}
+.heading-h1-block {
+  width: 24px;
+  height: 11px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+.heading-h2-block {
+  width: 16px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 8px;
+}
+.heading-h3-block {
+  width: 10px;
+  height: 9px;
+  border-radius: 1px;
+  margin-right: 7px;
+}
+.heading-h4-block {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  margin-right: 6px;
+}
   color: var(--wechat-ink);
 }
 .wechat-article p {
