@@ -481,6 +481,16 @@ function renderCallout(lines, index) {
     };
   }
 
+  if (type === "read" || type === "meta") {
+    const isLatepost = themePreset.value === "latepost";
+    const barColor = isLatepost ? "#ee0000" : (accentColor.value || "#7895a3");
+    const text = (title ? title + " " : "") + body.map(l => inlineMarkdown(l.trim())).join(" ");
+    return {
+      html: `<section class="latepost-read-meta" style="margin: 16px 0 22px; padding: 10px 14px; background-color: #f7f8f9; border-left: 3px solid ${barColor}; font-size: 13px; color: #555555; line-height: 1.6; border-radius: 0 4px 4px 0;"><span style="color: ${barColor}; font-weight: 700; margin-right: 6px;">⏱️</span>${text || "全文预计阅读时间约 3 分钟"}</section>`,
+      next: cursor + 1
+    };
+  }
+
   return {
     html: `<section class="callout callout-${escapeHtml(type)}"><strong>${inlineMarkdown(title)}</strong><p>${inlineMarkdown(body.join(" "))}</p></section>`,
     next: cursor + 1
@@ -1141,12 +1151,33 @@ ${customCssInput.value}
 `;
 }
 
+function getArticleStats(text) {
+  const clean = text || "";
+  const chineseChars = (clean.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const englishWords = (clean.match(/[a-zA-Z0-9_-]+/g) || []).length;
+  const totalChars = clean.replace(/\s+/g, "").length;
+  // 中文每分钟约380字，英文每分钟约200词
+  const totalReadingUnits = chineseChars + (englishWords * 0.8);
+  const readMinutes = totalReadingUnits > 0 ? Math.max(1, Math.round(totalReadingUnits / 380)) : 0;
+  return {
+    chineseChars,
+    englishWords,
+    totalChars,
+    totalWords: chineseChars + englishWords,
+    readMinutes
+  };
+}
+
 function updatePreview() {
   const markdown = markdownInput.value;
   preview.innerHTML = renderArticle(markdown);
   articleTheme.textContent = buildThemeCss();
   document.documentElement.style.setProperty("--accent", accentColor.value);
-  stats.textContent = `${markdown.replace(/\s+/g, "").length} 字 · 已自动保存`;
+  
+  const s = getArticleStats(markdown);
+  stats.innerHTML = `<span style="font-weight:600;color:var(--ink);">${s.totalWords.toLocaleString()} 字</span> <span style="opacity:0.35;margin:0 1px;">|</span> 约 ${s.readMinutes} 分钟 <span style="opacity:0.35;margin:0 1px;">|</span> <span style="color:#10b981;">已保存</span>`;
+  stats.title = `📊 数据看板（点击查看详情）：\n• 中文：${s.chineseChars} 字\n• 英文/数字：${s.englishWords} 词\n• 合计字数：${s.totalWords} 字\n• 总字符：${s.totalChars} 字符\n• 预估阅读：约 ${s.readMinutes} 分钟`;
+
   localStorage.setItem("wechat-md-content", markdown);
   localStorage.setItem("wechat-md-css", customCssInput.value);
   localStorage.setItem("wechat-md-accent", accentColor.value);
@@ -1707,4 +1738,34 @@ markdownInput.addEventListener("keydown", (e) => {
     return;
   }
 });
+
+// 插入字数与预估阅读时长导读栏
+const insertReadMetaButton = document.querySelector("#insertReadMetaButton");
+if (insertReadMetaButton) {
+  insertReadMetaButton.addEventListener("click", () => {
+    const text = markdownInput.value;
+    const s = getArticleStats(text);
+    const metaTag = `\n:::read\n全文约 ${s.totalWords.toLocaleString()} 字 · 预计阅读 ${s.readMinutes} 分钟\n:::\n\n`;
+
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const current = markdownInput.value;
+
+    markdownInput.value = current.substring(0, start) + metaTag + current.substring(end);
+    markdownInput.focus();
+    markdownInput.selectionStart = markdownInput.selectionEnd = start + metaTag.length;
+    updatePreview();
+    setStatus("已插入阅读导读栏");
+  });
+}
+
+// 点击字数看板弹出详细统计
+if (stats) {
+  stats.style.cursor = "pointer";
+  stats.addEventListener("click", () => {
+    const s = getArticleStats(markdownInput.value);
+    alert(`📊 文章字数与阅读时长数据看板：\n\n• 中文字数：${s.chineseChars.toLocaleString()} 字\n• 英文/数字：${s.englishWords.toLocaleString()} 词\n• 合计字数：${s.totalWords.toLocaleString()} 字\n• 总字符数（不含空格）：${s.totalChars.toLocaleString()} 字符\n• 预计阅读时长：约 ${s.readMinutes} 分钟（基于 380字/分钟 均速）\n• 本地状态：实时自动保存中`);
+  });
+}
+
 
