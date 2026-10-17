@@ -494,4 +494,102 @@ button:active,
   margin-right: 6px;
 }
 
+/* 扫码真机预览弹窗 */
+.qr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+.qr-modal-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px;
+  width: min(90vw, 360px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: qrModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes qrModalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.qr-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.qr-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--ink);
+}
+.qr-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+.qr-modal-close:hover {
+  color: var(--ink);
+}
+.qr-tip {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 14px 0 10px;
+  line-height: 1.5;
+}
+.qrcode-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 16px;
+  margin: 12px auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  min-height: 200px;
+}
+.qrcode-wrapper img, .qrcode-wrapper canvas {
+  display: block;
+  margin: 0 auto;
+}
+.qr-url-text {
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-all;
+  background: #f8fafc;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  margin: 10px 0 14px;
+  max-height: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qr-copy-btn {
+  width: 100%;
+  height: 38px;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.qr-copy-btn:hover {
+  opacity: 0.9;
+}
+
+
 

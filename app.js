@@ -523,7 +523,7 @@ function renderMarkdown(markdown) {
         highlighted = hljs.highlight(rawCode, { language: lang }).value;
       }
       const label = lang.toUpperCase() || "CODE";
-      html.push(`<section class="code-card"><div class="code-mac-header"><span></span><span></span><span></span></div><div class="code-label">${escapeHtml(label)}</div><pre><code class="hljs ${lang ? 'language-'+escapeHtml(lang) : ''}">${highlighted}</code></pre></section>`);
+      html.push(`<section class="code-card" style="margin: 20px 0; border-radius: 8px; background-color: #282c34; color: #abb2bf; overflow: hidden; position: relative;"><div class="code-mac-header" style="padding: 10px 14px 4px; line-height: 0; font-size: 0;"><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #ff5f56; margin-right: 6px; font-size: 0; line-height: 0; vertical-align: middle;">&nbsp;</span><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #ffbd2e; margin-right: 6px; font-size: 0; line-height: 0; vertical-align: middle;">&nbsp;</span><span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: #27c93f; font-size: 0; line-height: 0; vertical-align: middle;">&nbsp;</span></div><div class="code-label" style="position: absolute; top: 10px; right: 14px; color: rgba(255, 255, 255, 0.45); font-size: 11px; font-weight: 700; text-transform: uppercase;">${escapeHtml(label)}</div><pre style="margin: 0; padding: 12px 14px 14px; overflow-x: auto; font-family: Consolas, 'SFMono-Regular', Menlo, Courier, monospace; font-size: 13px; line-height: 1.6; background-color: transparent;"><code class="hljs ${lang ? 'language-'+escapeHtml(lang) : ''}" style="background-color: transparent; font-family: inherit; font-size: inherit; color: inherit; white-space: pre; word-break: normal;">${highlighted}</code></pre></section>`);
       continue;
     }
 
@@ -1146,7 +1146,7 @@ function updatePreview() {
   preview.innerHTML = renderArticle(markdown);
   articleTheme.textContent = buildThemeCss();
   document.documentElement.style.setProperty("--accent", accentColor.value);
-  stats.textContent = `${markdown.replace(/\s+/g, "").length} 字`;
+  stats.textContent = `${markdown.replace(/\s+/g, "").length} 字 · 已自动保存`;
   localStorage.setItem("wechat-md-content", markdown);
   localStorage.setItem("wechat-md-css", customCssInput.value);
   localStorage.setItem("wechat-md-accent", accentColor.value);
@@ -1511,3 +1511,200 @@ if (newDraftButton) {
     updatePreview();
   });
 }
+
+// 导出 Markdown (.md) 文件
+const exportMdButton = document.querySelector("#exportMdButton");
+if (exportMdButton) {
+  exportMdButton.addEventListener("click", () => {
+    const text = markdownInput.value;
+    const titleMatch = text.match(/^#\s+(.+)$/m);
+    const rawTitle = titleMatch ? titleMatch[1].trim() : "article";
+    const safeTitle = rawTitle.replace(/[\\/:*?"<>|]/g, "_").slice(0, 40);
+    const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeTitle}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setStatus(`已导出 Markdown：${safeTitle}.md`);
+  });
+}
+
+// 一键清空编辑器
+const clearEditorButton = document.querySelector("#clearEditorButton");
+if (clearEditorButton) {
+  clearEditorButton.addEventListener("click", () => {
+    if (confirm("确定要清空编辑器中的内容吗？\n（如果不确定，建议先点击【导出 MD】或在【草稿箱】备份）")) {
+      markdownInput.value = "";
+      markdownInput.focus();
+      updatePreview();
+      setStatus("编辑器已清空");
+    }
+  });
+}
+
+// 预览视口宽度切换
+const viewportSelect = document.querySelector("#viewportSelect");
+if (viewportSelect) {
+  viewportSelect.addEventListener("change", () => {
+    const val = viewportSelect.value;
+    preview.style.maxWidth = val;
+    setStatus(`已切换至视口：${viewportSelect.options[viewportSelect.selectedIndex].text}`);
+  });
+}
+
+// 扫码真机实时预览弹窗与二维码生成
+const qrcodeToggle = document.querySelector("#qrcodeToggle");
+const qrModal = document.querySelector("#qrModal");
+const closeQrModal = document.querySelector("#closeQrModal");
+const qrcodeContainer = document.querySelector("#qrcodeContainer");
+const qrUrlText = document.querySelector("#qrUrlText");
+const copyUrlButton = document.querySelector("#copyUrlButton");
+
+function openQrModal() {
+  if (!qrModal) return;
+  const url = window.location.href;
+  if (qrUrlText) qrUrlText.textContent = url;
+  qrModal.style.display = "flex";
+
+  if (qrcodeContainer) {
+    qrcodeContainer.innerHTML = "";
+    if (window.QRCode) {
+      new QRCode(qrcodeContainer, {
+        text: url,
+        width: 190,
+        height: 190,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } else {
+      const img = document.createElement("img");
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${encodeURIComponent(url)}`;
+      img.alt = "真机预览二维码";
+      img.style.width = "190px";
+      img.style.height = "190px";
+      qrcodeContainer.appendChild(img);
+    }
+  }
+}
+
+function hideQrModal() {
+  if (qrModal) qrModal.style.display = "none";
+}
+
+if (qrcodeToggle) qrcodeToggle.addEventListener("click", openQrModal);
+if (closeQrModal) closeQrModal.addEventListener("click", hideQrModal);
+if (qrModal) {
+  qrModal.addEventListener("click", (e) => {
+    if (e.target === qrModal) hideQrModal();
+  });
+}
+if (copyUrlButton) {
+  copyUrlButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      copyUrlButton.textContent = "已成功复制！";
+      setTimeout(() => { copyUrlButton.textContent = "复制真机预览链接"; }, 2000);
+    } catch (e) {
+      prompt("请手动复制链接：", window.location.href);
+    }
+  });
+}
+
+// 常用快捷键支持 (Hotkeys)
+markdownInput.addEventListener("keydown", (e) => {
+  const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const ctrlOrCmd = isMac ? e.metaKey : e.ctrlKey;
+
+  // 1. Tab / Shift+Tab 缩进 2 空格
+  if (e.key === "Tab") {
+    e.preventDefault();
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const val = markdownInput.value;
+    if (!e.shiftKey) {
+      markdownInput.value = val.substring(0, start) + "  " + val.substring(end);
+      markdownInput.selectionStart = markdownInput.selectionEnd = start + 2;
+    } else {
+      if (val.substring(start - 2, start) === "  ") {
+        markdownInput.value = val.substring(0, start - 2) + val.substring(end);
+        markdownInput.selectionStart = markdownInput.selectionEnd = start - 2;
+      }
+    }
+    updatePreview();
+    return;
+  }
+
+  if (!ctrlOrCmd) return;
+
+  // 2. Ctrl+S: 阻止浏览器默认保存网页，立即静默保存草稿
+  if (e.key.toLowerCase() === "s") {
+    e.preventDefault();
+    updatePreview();
+    setStatus("草稿已即时保存到本地");
+    return;
+  }
+
+  // 3. Ctrl+Enter: 快速复制富文本
+  if (e.key === "Enter") {
+    e.preventDefault();
+    copyRichText();
+    return;
+  }
+
+  // 4. Ctrl+B: 快速加粗
+  if (e.key.toLowerCase() === "b") {
+    e.preventDefault();
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const val = markdownInput.value;
+    const selected = val.substring(start, end);
+    if (selected) {
+      if (selected.startsWith("**") && selected.endsWith("**") && selected.length >= 4) {
+        const unwrapped = selected.slice(2, -2);
+        markdownInput.value = val.substring(0, start) + unwrapped + val.substring(end);
+        markdownInput.selectionStart = start;
+        markdownInput.selectionEnd = start + unwrapped.length;
+      } else {
+        const wrapped = `**${selected}**`;
+        markdownInput.value = val.substring(0, start) + wrapped + val.substring(end);
+        markdownInput.selectionStart = start;
+        markdownInput.selectionEnd = start + wrapped.length;
+      }
+    } else {
+      markdownInput.value = val.substring(0, start) + "****" + val.substring(end);
+      markdownInput.selectionStart = markdownInput.selectionEnd = start + 2;
+    }
+    updatePreview();
+    return;
+  }
+
+  // 5. Ctrl+1 ~ Ctrl+4: 快速设置当前行标题
+  if (["1", "2", "3", "4"].includes(e.key)) {
+    e.preventDefault();
+    const level = parseInt(e.key, 10);
+    const prefix = "#".repeat(level) + " ";
+    const start = markdownInput.selectionStart;
+    const end = markdownInput.selectionEnd;
+    const val = markdownInput.value;
+
+    const lastNewline = val.lastIndexOf("\n", start - 1);
+    const lineStart = lastNewline === -1 ? 0 : lastNewline + 1;
+    const nextNewline = val.indexOf("\n", start);
+    const lineEnd = nextNewline === -1 ? val.length : nextNewline;
+    const line = val.substring(lineStart, lineEnd);
+
+    const cleanLine = line.replace(/^#{1,6}\s*/, "");
+    const newLine = prefix + cleanLine;
+
+    markdownInput.value = val.substring(0, lineStart) + newLine + val.substring(lineEnd);
+    markdownInput.selectionStart = markdownInput.selectionEnd = lineStart + newLine.length;
+    updatePreview();
+    return;
+  }
+});
+
