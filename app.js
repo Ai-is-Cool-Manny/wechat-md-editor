@@ -103,7 +103,61 @@ console.log(idea);
 酷不是炫技，酷是一个东西真的让生活变轻了一点。
 `;
 
+const latepostSampleMarkdown = `# 独家对话美的方洪波：我只是一个过客，不需要被任何人记住
+
+:::card 美的集团董事长 方洪波
+“企业想要生生不息，依靠的是完善的公司治理，而不是一个人。”
+:::
+
+文丨宋玮
+
+13 年前，70 岁的美的公司创始人何享健把公司交给了 45 岁的方洪波。在那场意义非凡的交班仪式上，方洪波仅说了两句话，他说，“千里马常有，而伯乐不常有”，第二句话是，“我只是美的发展历史中的一个过客”。
+
+方洪波清晰知道自己是谁，一个过客。
+
+正是这名过客，创造了中国商业史上罕见的增长奇迹。在他接任美的董事长这十三年，美的收入增长了 4 倍，从 1000 亿到 4000 亿；市值翻了 8 倍，上涨了超过 5000 亿。
+
+## 我不加班，也不鼓励员工加班
+
+晚点：那个时候含金量很高是吧？
+
+方洪波：非常高，空中有一颗星用的就是他的名字。当年我骑着摩托车每天路过他家，豪华的奔驰 600 停在门口，大家都是非常仰望在看。
+
+晚点：听闻你喜欢研究商业变迁，美国 200 年商业变迁，能找到的资料你基本都看了。你从中看到的规律是什么？
+
+方洪波：摸着发达国家企业的发展经验过河。美的今天做的没有新鲜事，都是从发达国家的跨国企业经历过的事情中总结出来的。常识是跨越时间、空间，被检验证明不会变的。
+
+## 混乱是阶梯，美的的两次关键转型
+
+晚点：新时代的秩序、规则和底层技术都在动态变化，那老公司的护城河到底是什么？
+
+方洪波：它在不断的动态变化当中。过去 10 年美的护城河是效率。我们的现金周期是负的，家电行业里我估计目前只有美的实现了——我们做生意，不用自己拿本钱，都是用别人的钱在做生意。我们去年现金周期是 -9 天——这就是我的护城河，但这个护城河在不断地被侵蚀。
+
+题图来源：美的集团
+
+- FIN -
+`;
+
 const themePresets = {
+  latepost: {
+    accent: "#ee0000",
+    bg: "#ffffff",
+    ink: "#000000",
+    muted: "#737373",
+    soft: "#f2f3f3",
+    line: "#ee0000",
+    banner: "#ffffff",
+    codeBg: "#1f1f1f",
+    codeText: "#f5f5f5",
+    font: '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+    mono: 'Consolas, "SFMono-Regular", Menlo, monospace',
+    css: `.wechat-article { font-size: 15px; line-height: 1.75; letter-spacing: 0.8px; color: #000000; text-align: justify; }
+.wechat-article h1 { font-size: 24px; line-height: 1.35; font-weight: 700; letter-spacing: 0.5px; margin: 0 0 20px; color: #000000; }
+.wechat-article h2 { font-size: 20px; line-height: 1.25; font-weight: 700; letter-spacing: 0.5px; margin: 36px 0 16px; color: #000000; }
+.wechat-article h3 { font-size: 17px; line-height: 1.35; font-weight: 700; margin: 26px 0 12px; color: #000000; }
+.wechat-article p { margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify; color: #000000; }
+.wechat-article blockquote { margin: 20px 0; padding: 12px 16px; border-left: 3px solid #ee0000; background: #fbfbfb; color: #333333; }`
+  },
   appleClean: {
     accent: "#0071e3",
     bg: "#ffffff",
@@ -368,6 +422,23 @@ function renderCallout(lines, index) {
     cursor += 1;
   }
 
+  if (type === "card" || type === "latepost" || type === "quote-card") {
+    const author = title || "核心观点";
+    const quoteHtml = body.map(l => inlineMarkdown(l.trim())).join("<br>");
+    return {
+      html: `<section class="latepost-card" style="background-color: rgb(242, 243, 243); padding: 20px; margin: 24px 0; text-align: justify; box-sizing: border-box;"><div class="latepost-card-author" style="font-size: 14px; margin: 0 0 10px; color: #000000; font-weight: 700;"><strong>${escapeHtml(author)}</strong></div><div class="latepost-card-divider" style="background-color: rgb(238, 0, 0); height: 1px; margin: 10px 0 16px; line-height: 0;"></div><div class="latepost-card-quote" style="font-size: 14px; line-height: 1.75; color: #111111;">${quoteHtml}</div></section>`,
+      next: cursor + 1
+    };
+  }
+
+  if (type === "byline" || type === "author") {
+    const author = title || body.join(" ");
+    return {
+      html: `<section class="latepost-byline" style="text-align: right; font-size: 13px; margin: 40px 0; color: #000000; font-weight: 700;"><strong>文<span class="latepost-byline-bar" style="color: rgb(238, 0, 0); margin: 0 2px; font-weight: 700;">丨</span>${inlineMarkdown(author)}</strong></section>`,
+      next: cursor + 1
+    };
+  }
+
   if (type === "ref" || type === "reference") {
     const paras = [];
     let currentPara = [];
@@ -444,6 +515,26 @@ function renderMarkdown(markdown) {
       continue;
     }
 
+    if (/^\s*(?:-\s*FIN\s*-|---\s*FIN\s*---|--\s*FIN\s*--)\s*$/i.test(line)) {
+      html.push('<section class="latepost-fin" style="text-align: center; margin: 45px 0 30px; font-size: 12px; line-height: 1.2;"><strong style="color: #1d1d1d; font-weight: 700;"><span style="color: rgb(238, 0, 0); margin-right: 4px; font-weight: 700;">-</span>FIN<span style="color: rgb(238, 0, 0); margin-left: 4px; font-weight: 700;">-</span></strong></section>');
+      i += 1;
+      continue;
+    }
+
+    const bylineMatch = line.match(/^\s*(?:文丨|文\|)\s*(.+)$/);
+    if (bylineMatch) {
+      html.push(`<section class="latepost-byline" style="text-align: right; font-size: 13px; margin: 40px 0; color: #000000; font-weight: 700;"><strong>文<span class="latepost-byline-bar" style="color: rgb(238, 0, 0); margin: 0 2px; font-weight: 700;">丨</span>${inlineMarkdown(bylineMatch[1].trim())}</strong></section>`);
+      i += 1;
+      continue;
+    }
+
+    const creditMatch = line.match(/^\s*(?:题图来源|图源)[：:]\s*(.+)$/);
+    if (creditMatch) {
+      html.push(`<p class="latepost-credit" style="color: rgb(115, 115, 115); font-size: 13px; margin: 8px 0 20px; line-height: 1.4; letter-spacing: 0;">${escapeHtml(line.trim())}</p>`);
+      i += 1;
+      continue;
+    }
+
     if (/^\s*---+\s*$/.test(line)) {
       html.push("<hr>");
       i += 1;
@@ -454,15 +545,32 @@ function renderMarkdown(markdown) {
     if (heading) {
       const level = heading[1].length;
       const title = inlineMarkdown(heading[2].trim());
+      const isLatepost = themePreset.value === "latepost";
       if (level === 1) {
-        html.push(`<h1><span>${title}</span><i></i></h1>`);
+        html.push(isLatepost ? `<h1><span>${title}</span></h1>` : `<h1><span>${title}</span><i></i></h1>`);
       } else if (level === 2) {
-        html.push(`<h2><b>AI</b><span>${title}</span></h2>`);
+        html.push(isLatepost ? `<h2><span>${title}</span></h2>` : `<h2><b>AI</b><span>${title}</span></h2>`);
       } else if (level === 3) {
-        html.push(`<h3><b></b><span>${title}</span></h3>`);
+        html.push(isLatepost ? `<h3><span>${title}</span></h3>` : `<h3><b></b><span>${title}</span></h3>`);
       } else {
         html.push(`<h${level}>${title}</h${level}>`);
       }
+      i += 1;
+      continue;
+    }
+
+    const qMatch = line.match(/^(?:(?:\*\*晚点[：:]\*\*|晚点[：:]|\*\*Q[：:]\*\*|Q[：:]|问[：:])\s*)(.+)$/);
+    if (qMatch) {
+      html.push(`<p class="latepost-q" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-tag" style="background-color: #ee0000; color: #ffffff; padding: 1px 4px; margin-right: 5px; font-size: 14px; font-weight: 700; border-radius: 2px; display: inline-block; vertical-align: baseline; line-height: 1.2;">晚点</strong><strong style="font-weight: 700; color: #000000;">：${inlineMarkdown(qMatch[1].trim())}</strong></p>`);
+      i += 1;
+      continue;
+    }
+
+    const aMatch = line.match(/^(\*\*([^\*]+)[：:]\*\*|([^：:\s]{2,8})[：:])\s*(.+)$/);
+    if (aMatch && !line.startsWith("http") && !/^\d+\./.test(line)) {
+      const speaker = aMatch[2] || aMatch[3];
+      const speech = aMatch[4];
+      html.push(`<p class="latepost-a" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-speaker" style="font-weight: 700; color: #000000;">${escapeHtml(speaker)}</strong>：${inlineMarkdown(speech.trim())}</p>`);
       i += 1;
       continue;
     }
@@ -530,7 +638,12 @@ function renderMarkdown(markdown) {
       !/^>\s?/.test(lines[i]) &&
       !/^\s*[-*]\s+/.test(lines[i]) &&
       !/^\s*\d+\.\s+/.test(lines[i]) &&
-      !/^\s*---+\s*$/.test(lines[i])
+      !/^\s*---+\s*$/.test(lines[i]) &&
+      !/^\s*(?:-\s*FIN\s*-|---\s*FIN\s*---|--\s*FIN\s*--)\s*$/i.test(lines[i]) &&
+      !/^\s*(?:文丨|文\|)\s*/.test(lines[i]) &&
+      !/^\s*(?:题图来源|图源)[：:]/.test(lines[i]) &&
+      !/^(?:(?:\*\*晚点[：:]\*\*|晚点[：:]|\*\*Q[：:]\*\*|Q[：:]|问[：:])\s*)/.test(lines[i]) &&
+      !/^(\*\*([^\*]+)[：:]\*\*|([^：:\s]{2,8})[：:])\s*/.test(lines[i])
     ) {
       paragraph.push(lines[i].trim());
       i += 1;
@@ -542,7 +655,7 @@ function renderMarkdown(markdown) {
 }
 
 function getPreset() {
-  return themePresets[themePreset.value] || themePresets.morandiMist;
+  return themePresets[themePreset.value] || themePresets.latepost || themePresets.morandiMist;
 }
 
 function renderArticle(markdown) {
@@ -551,7 +664,7 @@ function renderArticle(markdown) {
   const tagline = escapeHtml(brandTagline.value || "关于 AI、工具与更好工作的冷静观察。");
   const body = renderMarkdown(markdown);
 
-  if (layoutStyle && layoutStyle.value === "minimal") {
+  if ((layoutStyle && layoutStyle.value === "minimal") || themePreset.value === "latepost") {
     return `<section class="article-body">${body}</section>`;
   }
 
@@ -669,7 +782,7 @@ function buildThemeCss() {
   font-weight: 700;
 }
 .article-body {
-  padding: 0 16px 10px;
+  padding: 0 4px 10px;
 }
 .wechat-article h1 {
   margin: 0 0 24px;
@@ -891,6 +1004,92 @@ function buildThemeCss() {
 .brand-footer p {
   margin: 6px 0;
 }
+/* 晚点组件通用样式 */
+.latepost-q {
+  margin: 16px 0;
+  line-height: 1.75;
+  letter-spacing: 0.8px;
+  text-align: justify;
+}
+.latepost-tag {
+  background-color: #ee0000;
+  color: #ffffff;
+  padding: 1px 4px;
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 2px;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 1.2;
+}
+.latepost-a {
+  margin: 16px 0;
+  line-height: 1.75;
+  letter-spacing: 0.8px;
+  text-align: justify;
+}
+.latepost-speaker {
+  font-weight: 700;
+  color: #000000;
+}
+.latepost-card {
+  background-color: rgb(242, 243, 243);
+  padding: 20px;
+  margin: 24px 0;
+  text-align: justify;
+  box-sizing: border-box;
+}
+.latepost-card-author {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: #000000;
+  font-weight: 700;
+}
+.latepost-card-divider {
+  background-color: rgb(238, 0, 0);
+  height: 1px;
+  margin: 10px 0 16px;
+  line-height: 0;
+}
+.latepost-card-quote {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #111111;
+}
+.latepost-byline {
+  text-align: right;
+  font-size: 13px;
+  margin: 40px 0;
+  color: #000000;
+  font-weight: 700;
+}
+.latepost-byline-bar {
+  color: rgb(238, 0, 0);
+  margin: 0 2px;
+  font-weight: 700;
+}
+.latepost-fin {
+  text-align: center;
+  margin: 45px 0 30px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.latepost-fin span {
+  color: rgb(238, 0, 0);
+  font-weight: 700;
+}
+.latepost-fin strong {
+  color: #1d1d1d;
+  font-weight: 700;
+}
+.latepost-credit {
+  color: rgb(115, 115, 115);
+  font-size: 13px;
+  margin: 8px 0 20px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
 ${preset.css}
 ${customCssInput.value}
 `;
@@ -925,46 +1124,100 @@ function updatePreview() {
   updatePreview.renderTimer = setTimeout(renderDrafts, 1000);
 }
 
-const inlineProperties = [
-  "display", "box-sizing", "position", "margin", "margin-top",
-  "margin-right", "margin-bottom", "margin-left", "padding", "padding-top",
-  "padding-right", "padding-bottom", "padding-left", "border", "border-top",
-  "border-right", "border-bottom", "border-left", "border-radius", "background",
-  "background-color", "background-image", "color", "font", "font-family", "font-size", "font-weight",
+const essentialProperties = [
+  "display", "box-sizing", "margin", "padding",
+  "background-color", "color", "font-family", "font-size", "font-weight",
   "font-style", "line-height", "letter-spacing", "text-align", "text-decoration",
-  "vertical-align", "white-space", "word-break", "overflow", "border-collapse"
+  "vertical-align", "white-space", "word-break", "border", "border-top",
+  "border-right", "border-bottom", "border-left", "border-radius"
 ];
 
 function inlineStyles(source, target) {
   if (source.nodeType !== Node.ELEMENT_NODE || target.nodeType !== Node.ELEMENT_NODE) return;
   const computed = getComputedStyle(source);
-  let styles = inlineProperties
-    .map((property) => `${property}:${computed.getPropertyValue(property)}`)
-    .join(";");
-
+  
+  const stylesArr = [];
   const tag = source.tagName.toLowerCase();
+
+  for (const prop of essentialProperties) {
+    const val = computed.getPropertyValue(prop);
+    if (!val || val === "normal" || val === "auto" || val === "none") continue;
+    
+    // 过滤透明背景
+    if (prop === "background-color" && (val === "rgba(0, 0, 0, 0)" || val === "transparent")) continue;
+    // 过滤无边框
+    if (prop.startsWith("border") && (val.includes("none") || val.startsWith("0px"))) continue;
+    // 过滤无内外边距
+    if ((prop === "margin" || prop === "padding") && (val === "0px" || val === "0px 0px 0px 0px")) continue;
+
+    // 清理 font-family 中的双引号，防止 HTML 属性引号破损
+    if (prop === "font-family") {
+      stylesArr.push(`${prop}:${val.replace(/"/g, "'")}`);
+      continue;
+    }
+
+    stylesArr.push(`${prop}:${val}`);
+  }
+
+  // 微信专用增强：保证图片和表格自适应
   if (tag === "img") {
-    styles += ";max-width:100%;height:auto";
-  }
-  if (tag === "table") {
-    styles += ";width:100%";
+    stylesArr.push("max-width:100%", "height:auto", "display:block", "margin:12px auto");
+  } else if (tag === "table") {
+    stylesArr.push("width:100%", "border-collapse:collapse");
+  } else if (tag === "p") {
+    stylesArr.push("box-sizing:border-box", "text-align:justify");
   }
 
-  target.setAttribute("style", styles);
+  // 合并原有的 inline style（如果已经有特设的内联样式）
+  const existingStyle = target.getAttribute("style");
+  if (existingStyle) {
+    stylesArr.push(existingStyle);
+  }
 
-  Array.from(source.children).forEach((child, index) => {
-    inlineStyles(child, target.children[index]);
+  target.setAttribute("style", stylesArr.join(";"));
+
+  const sourceChildren = Array.from(source.children);
+  const targetChildren = Array.from(target.children);
+  sourceChildren.forEach((child, index) => {
+    if (targetChildren[index]) {
+      inlineStyles(child, targetChildren[index]);
+    }
   });
 }
 
 function getInlineHtml() {
-  const wrapper = document.createElement("section");
+  const preset = getPreset();
+  const rootSection = document.createElement("section");
+  rootSection.className = "wechat-article-container";
+
+  // 1. 获取预览容器自身的全局计算样式，直接内联到顶层根容器，彻底防止微信后台剥除样式
+  const computedRoot = getComputedStyle(preview);
+  const isLatepost = themePreset.value === "latepost";
+  
+  const rootStyles = [
+    "box-sizing: border-box",
+    `font-family: ${preset.font.replace(/"/g, "'")}`,
+    `font-size: ${fontSize.value}px`,
+    `line-height: ${lineHeight.value}`,
+    `letter-spacing: ${isLatepost ? "0.8px" : "0px"}`,
+    `color: ${computedRoot.color || preset.ink}`,
+    `background-color: ${computedRoot.backgroundColor !== "rgba(0, 0, 0, 0)" ? computedRoot.backgroundColor : "#ffffff"}`,
+    "text-align: justify",
+    "word-break: break-word",
+    "padding: 0px 4px",
+    "margin: 0px auto",
+    "width: 100%"
+  ].join(";");
+  rootSection.setAttribute("style", rootStyles);
+
+  // 2. 遍历克隆并内联每个子元素
   Array.from(preview.children).forEach((child) => {
     const clone = child.cloneNode(true);
     inlineStyles(child, clone);
-    wrapper.appendChild(clone);
+    rootSection.appendChild(clone);
   });
-  return wrapper.innerHTML;
+
+  return rootSection.outerHTML;
 }
 
 function setStatus(message) {
@@ -982,25 +1235,46 @@ async function copyRichText() {
 
   const html = getInlineHtml();
   const plain = preview.innerText;
-  
+
   if (isDark) phoneShell.classList.add("dark-preview");
 
+  let copied = false;
+
+  // 1. 优先使用原生 copy 事件 (对微信公众号后台富文本粘贴支持度最好，100%保留内联格式)
   try {
-    if (navigator.clipboard && window.ClipboardItem) {
+    const copyHandler = (e) => {
+      e.clipboardData.setData("text/html", html);
+      e.clipboardData.setData("text/plain", plain);
+      e.preventDefault();
+    };
+    document.addEventListener("copy", copyHandler);
+    copied = document.execCommand("copy");
+    document.removeEventListener("copy", copyHandler);
+  } catch (e) {
+    console.warn("execCommand copy failed, trying navigator.clipboard...", e);
+  }
+
+  // 2. 如果 execCommand 没生效，使用现代 Clipboard API
+  if (!copied && navigator.clipboard && window.ClipboardItem) {
+    try {
       await navigator.clipboard.write([
         new ClipboardItem({
           "text/html": new Blob([html], { type: "text/html" }),
           "text/plain": new Blob([plain], { type: "text/plain" })
         })
       ]);
-    } else {
-      fallbackCopy(html);
+      copied = true;
+    } catch (e) {
+      console.warn("ClipboardItem write failed, using DOM fallback...", e);
     }
-    setStatus("已复制，可粘贴到公众号后台");
-  } catch (error) {
-    fallbackCopy(html);
-    setStatus("已复制，可粘贴到公众号后台");
   }
+
+  // 3. 兜底方案
+  if (!copied) {
+    fallbackCopy(html);
+  }
+
+  setStatus("已成功复制完整样式（可直接粘贴到公众号后台）");
 }
 
 function fallbackCopy(html) {
@@ -1036,30 +1310,35 @@ ${getInlineHtml()}
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "ai-is-cool-article.html";
+  link.download = "wechat-article.html";
   link.click();
   URL.revokeObjectURL(link.href);
 }
 
 function applyPreset(presetName) {
-  const preset = themePresets[presetName] || themePresets.morandiMist;
+  const preset = themePresets[presetName] || themePresets.latepost || themePresets.morandiMist;
   accentColor.value = preset.accent;
   customCssInput.value = preset.css;
+  if (presetName === "latepost") {
+    fontSize.value = "15";
+    lineHeight.value = "1.75";
+    if (layoutStyle) layoutStyle.value = "minimal";
+  }
 }
 
 function loadSavedState() {
   const savedPreset = localStorage.getItem("wechat-md-preset");
   const hasKnownPreset = Boolean(savedPreset && themePresets[savedPreset]);
-  themePreset.value = hasKnownPreset ? savedPreset : "morandiMist";
+  themePreset.value = hasKnownPreset ? savedPreset : "latepost";
   const preset = getPreset();
   if (layoutStyle) {
-    layoutStyle.value = localStorage.getItem("wechat-md-layout") || "brand";
+    layoutStyle.value = localStorage.getItem("wechat-md-layout") || (themePreset.value === "latepost" ? "minimal" : "brand");
   }
-  markdownInput.value = localStorage.getItem("wechat-md-content") || sampleMarkdown;
+  markdownInput.value = localStorage.getItem("wechat-md-content") || (themePreset.value === "latepost" ? latepostSampleMarkdown : sampleMarkdown);
   customCssInput.value = hasKnownPreset ? (localStorage.getItem("wechat-md-css") || preset.css) : preset.css;
   accentColor.value = hasKnownPreset ? (localStorage.getItem("wechat-md-accent") || preset.accent) : preset.accent;
-  fontSize.value = localStorage.getItem("wechat-md-font-size") || "16";
-  lineHeight.value = localStorage.getItem("wechat-md-line-height") || "1.9";
+  fontSize.value = localStorage.getItem("wechat-md-font-size") || (themePreset.value === "latepost" ? "15" : "16");
+  lineHeight.value = localStorage.getItem("wechat-md-line-height") || (themePreset.value === "latepost" ? "1.75" : "1.9");
   brandName.value = localStorage.getItem("wechat-md-brand") || "AI is cool.";
   bannerNote.value = localStorage.getItem("wechat-md-note") || "LOCAL NOTE";
   brandTagline.value = localStorage.getItem("wechat-md-tagline") || "关于 AI、工具与更好工作的冷静观察。";
@@ -1084,15 +1363,26 @@ themePreset.addEventListener("change", () => {
   updatePreview();
 });
 
+const latepostTemplateButton = document.querySelector("#latepostTemplateButton");
+if (latepostTemplateButton) {
+  latepostTemplateButton.addEventListener("click", () => {
+    themePreset.value = "latepost";
+    applyPreset("latepost");
+    markdownInput.value = latepostSampleMarkdown;
+    updatePreview();
+    setStatus("已载入《晚点》专访完整范例模版");
+  });
+}
+
 document.querySelector("#copyButton").addEventListener("click", copyRichText);
 document.querySelector("#exportButton").addEventListener("click", exportHtml);
 document.querySelector("#resetCssButton").addEventListener("click", () => {
-  themePreset.value = "morandiMist";
-  applyPreset("morandiMist");
+  themePreset.value = "latepost";
+  applyPreset("latepost");
   brandName.value = "AI is cool.";
   brandTagline.value = "关于 AI、工具与更好工作的冷静观察。";
-  fontSize.value = "16";
-  lineHeight.value = "1.9";
+  fontSize.value = "15";
+  lineHeight.value = "1.75";
   updatePreview();
 });
 

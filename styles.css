@@ -168,7 +168,7 @@ button:active,
   min-height: 100%;
   margin: 0 auto;
   background: #fff;
-  padding: 0;
+  padding: 0 4px;
   box-shadow: 0 16px 42px rgba(15, 23, 42, 0.14);
 }
 
@@ -372,3 +372,91 @@ button:active,
   --wechat-banner: #242424;
   --wechat-soft: #242424;
 }
+
+/* 晚点独家专访排版组件 */
+.latepost-q {
+  margin: 16px 0;
+  line-height: 1.75;
+  letter-spacing: 0.8px;
+  text-align: justify;
+}
+.latepost-tag {
+  background-color: #ee0000;
+  color: #ffffff;
+  padding: 1px 4px;
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 2px;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 1.2;
+}
+.latepost-a {
+  margin: 16px 0;
+  line-height: 1.75;
+  letter-spacing: 0.8px;
+  text-align: justify;
+}
+.latepost-speaker {
+  font-weight: 700;
+  color: #000000;
+}
+.latepost-card {
+  background-color: rgb(242, 243, 243);
+  padding: 20px;
+  margin: 24px 0;
+  text-align: justify;
+  box-sizing: border-box;
+}
+.latepost-card-author {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: #000000;
+  font-weight: 700;
+}
+.latepost-card-divider {
+  background-color: rgb(238, 0, 0);
+  height: 1px;
+  margin: 10px 0 16px;
+  line-height: 0;
+}
+.latepost-card-quote {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #111111;
+}
+.latepost-byline {
+  text-align: right;
+  font-size: 13px;
+  margin: 40px 0;
+  color: #000000;
+  font-weight: 700;
+}
+.latepost-byline-bar {
+  color: rgb(238, 0, 0);
+  margin: 0 2px;
+  font-weight: 700;
+}
+.latepost-fin {
+  text-align: center;
+  margin: 45px 0 30px;
+  font-size: 12px;
+  line-height: 1.2;
+}
+.latepost-fin span {
+  color: rgb(238, 0, 0);
+  font-weight: 700;
+}
+.latepost-fin b, .latepost-fin strong {
+  color: #1d1d1d;
+  font-weight: 700;
+}
+.latepost-credit {
+  color: rgb(115, 115, 115);
+  font-size: 13px;
+  margin: 8px 0 20px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+

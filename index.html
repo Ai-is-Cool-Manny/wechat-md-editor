@@ -41,7 +41,13 @@
         <span id="stats">0 字</span>
       </div>
       <div class="editor-toolbar">
+        <button type="button" id="latepostTemplateButton" style="color: #ee0000; font-weight: bold; border-color: #ee0000;">晚点范例</button>
         <button type="button" data-insert="**文本**">加粗</button>
+        <button type="button" data-insert="\n晚点：">晚点问</button>
+        <button type="button" data-insert="\n方洪波：">嘉宾答</button>
+        <button type="button" data-insert="&#10;:::card 嘉宾职务 嘉宾姓名&#10;“核心金句名言观点。”&#10;:::&#10;">金句卡片</button>
+        <button type="button" data-insert="&#10;文丨作者名&#10;">署名</button>
+        <button type="button" data-insert="&#10;&#10;- FIN -&#10;&#10;">结语FIN</button>
         <button type="button" data-insert="[链接描述](https://)">链接</button>
         <button type="button" data-insert="\n> 引用文本\n">引用</button>
         <button type="button" data-insert="\n:::cool 提示标题\n提示内容\n:::\n">提示框</button>
@@ -73,6 +79,7 @@
       <label class="field">
         <span>主题预设</span>
         <select id="themePreset">
+          <option value="latepost" selected>晚点商业特写 (LatePost 经典黑白红)</option>
           <option value="appleClean">苹果极简白 (Apple Clean)</option>
           <option value="morandiMist">莫兰迪雾青</option>
           <option value="morandiSage">莫兰迪鼠尾草</option>
