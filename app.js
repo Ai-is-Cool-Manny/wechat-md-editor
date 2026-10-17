@@ -441,6 +441,15 @@ function renderCallout(lines, index) {
     };
   }
 
+  if (type === "q" || type === "ask" || type === "question") {
+    const questioner = title || "提问";
+    const qBody = body.map(l => inlineMarkdown(l.trim())).join("<br>");
+    return {
+      html: `<p class="latepost-q" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-tag" style="background-color: #ee0000; color: #ffffff; padding: 1px 5px; margin-right: 6px; font-size: 14px; font-weight: 700; border-radius: 2px; display: inline-block; vertical-align: baseline; line-height: 1.2;">${escapeHtml(questioner)}</strong><strong style="font-weight: 700; color: #000000;">：${qBody}</strong></p>`,
+      next: cursor + 1
+    };
+  }
+
   if (type === "byline" || type === "author") {
     const author = title || body.join(" ");
     return {
@@ -577,18 +586,22 @@ function renderMarkdown(markdown) {
       continue;
     }
 
-    const qMatch = line.match(/^(?:(?:\*\*晚点[：:]\*\*|晚点[：:]|\*\*Q[：:]\*\*|Q[：:]|问[：:])\s*)(.+)$/);
+    // 匹配提问：支持【任意名字】：问题、[任意名字]：问题、**【任意名字】：**问题、晚点：问题、Q：问题、提问：问题、问：问题（字数不限）
+    const qMatch = line.match(/^(?:(?:\*\*(?:【([^】]+)】|\[([^\]]+)\]|(晚点|提问|Q|问))[：:]\*\*|(?:【([^】]+)】|\[([^\]]+)\]|(晚点|提问|Q|问))[：:])\s*)(.+)$/i);
     if (qMatch) {
-      html.push(`<p class="latepost-q" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-tag" style="background-color: #ee0000; color: #ffffff; padding: 1px 4px; margin-right: 5px; font-size: 14px; font-weight: 700; border-radius: 2px; display: inline-block; vertical-align: baseline; line-height: 1.2;">晚点</strong><strong style="font-weight: 700; color: #000000;">：${inlineMarkdown(qMatch[1].trim())}</strong></p>`);
+      const tagText = qMatch[1] || qMatch[2] || qMatch[3] || qMatch[4] || qMatch[5] || qMatch[6] || "提问";
+      const qText = qMatch[7];
+      html.push(`<p class="latepost-q" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-tag" style="background-color: #ee0000; color: #ffffff; padding: 1px 5px; margin-right: 6px; font-size: 14px; font-weight: 700; border-radius: 2px; display: inline-block; vertical-align: baseline; line-height: 1.2;">${escapeHtml(tagText)}</strong><strong style="font-weight: 700; color: #000000;">：${inlineMarkdown(qText.trim())}</strong></p>`);
       i += 1;
       continue;
     }
 
-    const aMatch = line.match(/^(\*\*([^\*]+)[：:]\*\*|([^：:\s]{2,8})[：:])\s*(.+)$/);
+    // 匹配回答：支持 发言人：回答、**发言人：**回答（字数不限）
+    const aMatch = line.match(/^(?:\*\*([^*：:\n]+)[：:]\*\*|([^：:\s\d*#<>\[\]【】]{1,50}))[：:]\s*(.+)$/);
     if (aMatch && !line.startsWith("http") && !/^\d+\./.test(line)) {
-      const speaker = aMatch[2] || aMatch[3];
-      const speech = aMatch[4];
-      html.push(`<p class="latepost-a" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-speaker" style="font-weight: 700; color: #000000;">${escapeHtml(speaker)}</strong>：${inlineMarkdown(speech.trim())}</p>`);
+      const speaker = aMatch[1] || aMatch[2];
+      const speech = aMatch[3];
+      html.push(`<p class="latepost-a" style="margin: 16px 0; line-height: 1.75; letter-spacing: 0.8px; text-align: justify;"><strong class="latepost-speaker" style="font-weight: 700; color: #000000;">${escapeHtml(speaker.trim())}</strong>：${inlineMarkdown(speech.trim())}</p>`);
       i += 1;
       continue;
     }
@@ -660,8 +673,8 @@ function renderMarkdown(markdown) {
       !/^\s*(?:-\s*FIN\s*-|---\s*FIN\s*---|--\s*FIN\s*--)\s*$/i.test(lines[i]) &&
       !/^\s*(?:文丨|文\|)\s*/.test(lines[i]) &&
       !/^\s*(?:题图来源|图源)[：:]/.test(lines[i]) &&
-      !/^(?:(?:\*\*晚点[：:]\*\*|晚点[：:]|\*\*Q[：:]\*\*|Q[：:]|问[：:])\s*)/.test(lines[i]) &&
-      !/^(\*\*([^\*]+)[：:]\*\*|([^：:\s]{2,8})[：:])\s*/.test(lines[i])
+      !/^(?:(?:\*\*(?:【[^】]+】|\[[^\]]+\]|晚点|提问|Q|问)[：:]\*\*|(?:【[^】]+】|\[[^\]]+\]|晚点|提问|Q|问))[：:])\s*/i.test(lines[i]) &&
+      !/^(?:\*\*([^*：:\n]+)[：:]\*\*|([^：:\s\d*#<>\[\]【】]{1,50}))[：:]\s*/.test(lines[i])
     ) {
       paragraph.push(lines[i].trim());
       i += 1;
@@ -1396,16 +1409,6 @@ themePreset.addEventListener("change", () => {
   updatePreview();
 });
 
-const latepostTemplateButton = document.querySelector("#latepostTemplateButton");
-if (latepostTemplateButton) {
-  latepostTemplateButton.addEventListener("click", () => {
-    themePreset.value = "latepost";
-    applyPreset("latepost");
-    markdownInput.value = latepostSampleMarkdown;
-    updatePreview();
-    setStatus("已载入《晚点》专访完整范例模版");
-  });
-}
 
 document.querySelector("#copyButton").addEventListener("click", copyRichText);
 document.querySelector("#exportButton").addEventListener("click", exportHtml);
