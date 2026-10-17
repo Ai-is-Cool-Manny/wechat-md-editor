@@ -2,7 +2,7 @@
 // 负责处理 R2 图床上传与分发，并将所有静态网页请求代理至前端页面
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
     // 1. 上传图片到 Cloudflare R2 存储桶
@@ -11,7 +11,7 @@ export default {
       if (!bucket) {
         return new Response(
           JSON.stringify({
-            error: "Cloudflare R2 尚未绑定。请在 Cloudflare 项目设置 -> 绑定 (Bindings) 中添加 R2 存储桶，变量名填写 'R2'。"
+            error: "Cloudflare R2 尚未绑定。请检查 wrangler.toml 中的 R2 配置。"
           }),
           { status: 503, headers: { "Content-Type": "application/json" } }
         );
@@ -28,8 +28,8 @@ export default {
           });
         }
 
-        // 生成唯一路径: uploads/202610/timestamp_random.png
-        const ext = file.name ? file.name.split(".").pop().toLowerCase() : "png";
+        // 生成唯一路径: uploads/202610/timestamp_random.ext
+        const ext = file.name ? file.name.split(".").pop().toLowerCase() : "jpg";
         const datePrefix = new Date().toISOString().slice(0, 7).replace("-", "");
         const randomHash = Math.random().toString(36).substring(2, 10);
         const key = `uploads/${datePrefix}/${Date.now()}_${randomHash}.${ext}`;
@@ -37,7 +37,7 @@ export default {
         const arrayBuffer = await file.arrayBuffer();
         await bucket.put(key, arrayBuffer, {
           httpMetadata: {
-            contentType: file.type || "image/png"
+            contentType: file.type || "image/jpeg"
           }
         });
 
@@ -60,8 +60,14 @@ export default {
       }
     }
 
-    // 2. 从 R2 极速读取图片并进行全球 CDN 永久缓存
+    // 2. 从 R2 极速读取图片并进行 Cloudflare 边缘节点永久 CDN 缓存
     if (url.pathname === "/api/image" && request.method === "GET") {
+      const cache = caches.default;
+      const cached = await cache.match(request);
+      if (cached) {
+        return cached;
+      }
+
       const bucket = env.R2 || env.BUCKET;
       const key = url.searchParams.get("key");
 
@@ -80,8 +86,18 @@ export default {
         headers.set("etag", object.httpEtag);
         // 全球永久强缓存 1 年
         headers.set("Cache-Control", "public, max-age=31536000, immutable");
+        // 允许微信爬虫与任何源跨域抓取，彻底避免防盗链拦截
+        headers.set("Access-Control-Allow-Origin", "*");
+        if (!headers.has("Content-Type") || headers.get("Content-Type") === "application/octet-stream") {
+          const isPng = key.toLowerCase().endsWith(".png");
+          headers.set("Content-Type", isPng ? "image/png" : "image/jpeg");
+        }
 
-        return new Response(object.body, { headers });
+        const response = new Response(object.body, { headers });
+        if (ctx && ctx.waitUntil) {
+          ctx.waitUntil(cache.put(request, response.clone()));
+        }
+        return response;
       } catch (err) {
         return new Response("Error fetching image from R2", { status: 500 });
       }
