@@ -12,19 +12,34 @@
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <h1>AI is cool. 排版工作台</h1>
-      <p>本地编辑、实时预览、一键复制到微信公众号后台。</p>
+    <div class="brand-group">
+      <div class="brand-logo">
+        <span class="brand-symbol">✦</span>
+        <h1>AI is cool. <span class="badge-tag">Studio</span></h1>
+      </div>
+      <p class="brand-desc">公众号 Markdown 极简排版工作台 · 专为深度内容创作者设计</p>
     </div>
     <div class="actions">
-      <button id="toggleDraftsButton" type="button">草稿箱</button>
-      <label class="file-button">
-        导入 MD
-        <input id="fileInput" type="file" accept=".md,.markdown,text/markdown,text/plain">
-      </label>
-      <button id="exportMdButton" type="button">导出 MD</button>
-      <button id="copyButton" type="button" title="快捷键: Ctrl+Enter">复制富文本</button>
-      <button id="exportButton" type="button">导出 HTML</button>
+      <button id="toggleDraftsButton" type="button" class="btn-apple btn-subtle" title="展开/收起我的草稿箱">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        草稿箱
+      </button>
+      <div class="btn-segmented">
+        <label class="file-button btn-apple" title="导入本地 Markdown 文件">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          导入 MD
+          <input id="fileInput" type="file" accept=".md,.markdown,text/markdown,text/plain">
+        </label>
+        <button id="exportMdButton" type="button" class="btn-apple" title="导出为本地 .md 文件">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          导出 MD
+        </button>
+        <button id="exportButton" type="button" class="btn-apple" title="导出完整 HTML 源码">HTML</button>
+      </div>
+      <button id="copyButton" type="button" class="btn-apple btn-primary" title="一键复制富文本排版（快捷键: Ctrl+Enter）">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        复制富文本
+      </button>
     </div>
   </header>
 
@@ -32,130 +47,180 @@
     <aside class="draft-drawer" id="draftDrawer" style="display: none;">
       <div class="panel-head">
         <h2>草稿箱</h2>
-        <button id="newDraftButton" type="button" style="height:24px;padding:0 8px;font-size:12px;">新建</button>
+        <button id="newDraftButton" type="button" class="btn-apple btn-xs">新建</button>
       </div>
       <ul id="draftList" class="draft-list"></ul>
     </aside>
 
     <section class="editor-panel" aria-label="Markdown 编辑区">
       <div class="panel-head">
-        <h2>Markdown</h2>
-        <span id="stats">0 字 · 实时保存中</span>
+        <div class="panel-title-group">
+          <h2>Markdown</h2>
+          <span class="panel-sub">源文编辑</span>
+        </div>
+        <div class="stats-board" id="stats" title="点击查看文章字数与耗时详细看板">0 字 · 约 0 分钟 · 已保存</div>
       </div>
+
       <div class="editor-toolbar">
-        <button type="button" data-insert="\n# 一级标题\n" title="快捷键: Ctrl+1">H1长方块</button>
-        <button type="button" data-insert="\n## 二级标题\n" title="快捷键: Ctrl+2">H2中方块</button>
-        <button type="button" data-insert="\n### 三级标题\n" title="快捷键: Ctrl+3">H3小方块</button>
-        <button type="button" data-insert="\n#### 四级标题\n" title="快捷键: Ctrl+4">H4点方块</button>
-        <button type="button" data-insert="**文本**" title="快捷键: Ctrl+B">加粗</button>
-        <button type="button" data-insert="\n【提问】：输入问题内容\n">红标提问</button>
-        <button type="button" data-insert="\n回答者：输入回答内容\n">粗体回答</button>
-        <button type="button" data-insert="&#10;:::card 嘉宾职务 嘉宾姓名&#10;“核心金句名言观点。”&#10;:::&#10;">金句卡片</button>
-        <button type="button" data-insert="&#10;文丨作者名&#10;">署名</button>
-        <button type="button" data-insert="&#10;&#10;- FIN -&#10;&#10;">结语FIN</button>
-        <button type="button" id="insertReadMetaButton" title="快捷插入当前文章字数与预估阅读时长导读">阅读导读</button>
-        <button type="button" data-insert="[链接描述](https://)">链接</button>
-        <label class="toolbar-file-button" title="点击选择本地电脑图片（支持拖拽或直接 Ctrl+V 粘贴截图）">
-          插入图片
-          <input id="imageFileInput" type="file" accept="image/*" multiple style="display:none;">
-        </label>
-        <button type="button" data-insert="\n> 引用文本\n">引用</button>
-        <button type="button" data-insert="\n:::cool 提示标题\n提示内容\n:::\n">提示框</button>
-        <button type="button" data-insert="\n:::ref\n参考文献内容\n:::\n">参考文献</button>
-        <button type="button" id="formatPanguButton">一键排版</button>
-        <button type="button" id="clearEditorButton" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.35);" title="清空当前输入">清空</button>
+        <!-- 分组 1: 标题层级 -->
+        <div class="toolbar-group" title="标题层级">
+          <button type="button" data-insert="\n# 一级标题\n" title="快捷键: Ctrl+1" class="btn-tool">H1长方</button>
+          <button type="button" data-insert="\n## 二级标题\n" title="快捷键: Ctrl+2" class="btn-tool">H2中方</button>
+          <button type="button" data-insert="\n### 三级标题\n" title="快捷键: Ctrl+3" class="btn-tool">H3小方</button>
+          <button type="button" data-insert="\n#### 四级标题\n" title="快捷键: Ctrl+4" class="btn-tool">H4微方</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 2: 晚点特稿专访组件 -->
+        <div class="toolbar-group toolbar-latepost-group" title="晚点特稿专访专属排版">
+          <button type="button" data-insert="\n【提问】：输入问题内容\n" class="btn-tool btn-tool-accent" title="红底白字提问标签（提问人可自定义无字数限制）">红标提问</button>
+          <button type="button" data-insert="\n回答者：输入回答内容\n" class="btn-tool btn-tool-ink" title="加粗发言人回答（发言人可自定义无字数限制）">粗体回答</button>
+          <button type="button" data-insert="&#10;:::card 嘉宾职务 嘉宾姓名&#10;“核心金句名言观点。”&#10;:::&#10;" class="btn-tool">金句卡片</button>
+          <button type="button" data-insert="&#10;文丨作者名&#10;" class="btn-tool">署名</button>
+          <button type="button" data-insert="&#10;&#10;- FIN -&#10;&#10;" class="btn-tool">结语FIN</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 3: 常用排版与多媒体 -->
+        <div class="toolbar-group" title="基础排版元素">
+          <button type="button" data-insert="**文本**" title="快捷键: Ctrl+B" class="btn-tool"><strong>B</strong></button>
+          <button type="button" data-insert="[链接描述](https://)" class="btn-tool">链接</button>
+          <label class="toolbar-file-button btn-tool" title="点击选择本地电脑图片（支持拖拽或直接 Ctrl+V 粘贴截图）">
+            图片
+            <input id="imageFileInput" type="file" accept="image/*" multiple style="display:none;">
+          </label>
+          <button type="button" data-insert="\n> 引用文本\n" class="btn-tool">引用</button>
+          <button type="button" data-insert="\n:::cool 提示标题\n提示内容\n:::\n" class="btn-tool">提示框</button>
+          <button type="button" data-insert="\n:::ref\n参考文献内容\n:::\n" class="btn-tool">文献</button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <!-- 分组 4: 辅助工具 -->
+        <div class="toolbar-group toolbar-group-end" title="效率工具">
+          <button type="button" id="insertReadMetaButton" class="btn-tool" title="快捷插入当前文章字数与预估阅读时长导读">导读</button>
+          <button type="button" id="formatPanguButton" class="btn-tool" title="中英文间自动智能加空格">排版</button>
+          <button type="button" id="clearEditorButton" class="btn-tool btn-tool-danger" title="清空当前输入">清空</button>
+        </div>
       </div>
-      <textarea id="markdownInput" spellcheck="false"></textarea>
+
+      <textarea id="markdownInput" spellcheck="false" placeholder="在此输入 Markdown 内容，支持图片直接 Ctrl+V 粘贴与文件拖拽..."></textarea>
     </section>
 
     <section class="preview-panel" aria-label="公众号预览区">
       <div class="panel-head">
-        <h2>公众号预览</h2>
-        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-          <select id="viewportSelect" style="height:24px;padding:0 6px;font-size:12px;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer;">
+        <div class="panel-title-group">
+          <h2>公众号预览</h2>
+          <span class="preview-device-badge">iPhone 15</span>
+        </div>
+        <div class="preview-controls">
+          <select id="viewportSelect" class="apple-select-compact">
             <option value="390px">iPhone 14/15 (390px)</option>
             <option value="375px">标准屏 (375px)</option>
             <option value="428px">Plus/Max (428px)</option>
             <option value="100%">平铺全宽 (100%)</option>
           </select>
-          <button id="qrcodeToggle" type="button" style="height:24px;padding:0 8px;font-size:12px;">扫码真机预览</button>
-          <button id="darkModeToggle" type="button" style="height:24px;padding:0 8px;font-size:12px;">深色预览</button>
-          <span id="copyStatus">准备就绪</span>
+          <button id="qrcodeToggle" type="button" class="btn-apple btn-xs" title="手机扫码在真机上体验排版效果">📱 扫码</button>
+          <button id="darkModeToggle" type="button" class="btn-apple btn-xs" title="切换深色/浅色模式预览">深色</button>
+          <span id="copyStatus" class="status-badge">准备就绪</span>
         </div>
       </div>
-      <div class="phone-shell">
-        <section id="preview" class="wechat-article"></section>
+
+      <div class="phone-stage">
+        <div class="iphone-bezel">
+          <div class="dynamic-island"></div>
+          <div class="phone-shell">
+            <section id="preview" class="wechat-article"></section>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
       </div>
     </section>
 
     <aside class="settings-panel" aria-label="样式设置">
       <div class="panel-head">
-        <h2>品牌样式</h2>
-        <button id="resetCssButton" type="button">重置</button>
+        <div class="panel-title-group">
+          <h2>品牌样式</h2>
+          <span class="panel-sub">视觉定制</span>
+        </div>
+        <button id="resetCssButton" type="button" class="btn-apple btn-xs">重置</button>
       </div>
 
-      <label class="field">
-        <span>主题预设</span>
-        <select id="themePreset">
-          <option value="latepost" selected>晚点商业特写 (LatePost 经典黑白红)</option>
-          <option value="appleClean">苹果极简白 (Apple Clean)</option>
-          <option value="morandiMist">莫兰迪雾青</option>
-          <option value="morandiSage">莫兰迪鼠尾草</option>
-          <option value="morandiClay">莫兰迪陶土</option>
-          <option value="morandiInk">莫兰迪墨灰</option>
-          <option value="limeGreen">莱姆绿</option>
-          <option value="hermesOrange">爱马仕橙</option>
-          <option value="titianRed">提香红</option>
-          <option value="marrsGreen">马尔斯绿</option>
-          <option value="kleinBlue">克莱因蓝 (高定学术)</option>
-          <option value="veryPeri">长春花蓝 (年度流行)</option>
-          <option value="obsidianBlack">曜石黑 (极简高级)</option>
-          <option value="sunsetYellow">日落黄 (温暖质感)</option>
-        </select>
-      </label>
+      <div class="settings-scroll-area">
+        <div class="settings-card">
+          <div class="settings-card-title">视觉风格</div>
+          <label class="field">
+            <span>主题预设</span>
+            <select id="themePreset">
+              <option value="latepost" selected>晚点商业特写 (LatePost 经典黑白红)</option>
+              <option value="appleClean">苹果极简白 (Apple Clean)</option>
+              <option value="morandiMist">莫兰迪雾青</option>
+              <option value="morandiSage">莫兰迪鼠尾草</option>
+              <option value="morandiClay">莫兰迪陶土</option>
+              <option value="morandiInk">莫兰迪墨灰</option>
+              <option value="limeGreen">莱姆绿</option>
+              <option value="hermesOrange">爱马仕橙</option>
+              <option value="titianRed">提香红</option>
+              <option value="marrsGreen">马尔斯绿</option>
+              <option value="kleinBlue">克莱因蓝 (高定学术)</option>
+              <option value="veryPeri">长春花蓝 (年度流行)</option>
+              <option value="obsidianBlack">曜石黑 (极简高级)</option>
+              <option value="sunsetYellow">日落黄 (温暖质感)</option>
+            </select>
+          </label>
 
-      <label class="field">
-        <span>排版风格</span>
-        <select id="layoutStyle">
-          <option value="brand">经典品牌风 (带 Banner)</option>
-          <option value="minimal">极简纯净风 (无 Banner)</option>
-        </select>
-      </label>
+          <label class="field">
+            <span>排版风格</span>
+            <select id="layoutStyle">
+              <option value="brand">经典品牌风 (带 Banner)</option>
+              <option value="minimal">极简纯净风 (无 Banner)</option>
+            </select>
+          </label>
 
-      <label class="field">
-        <span>公众号名</span>
-        <input id="brandName" type="text" value="AI is cool.">
-      </label>
+          <label class="field field-row">
+            <span>主题强调色</span>
+            <input id="accentColor" type="color" value="#7895a3">
+          </label>
+        </div>
 
-      <label class="field">
-        <span>Banner 提示</span>
-        <input id="bannerNote" type="text" value="LOCAL NOTE">
-      </label>
+        <div class="settings-card">
+          <div class="settings-card-title">品牌信息</div>
+          <label class="field">
+            <span>公众号名</span>
+            <input id="brandName" type="text" value="AI is cool.">
+          </label>
 
-      <label class="field">
-        <span>品牌标语</span>
-        <input id="brandTagline" type="text" value="关于 AI、工具与更好工作的冷静观察。">
-      </label>
+          <label class="field">
+            <span>Banner 提示</span>
+            <input id="bannerNote" type="text" value="LOCAL NOTE">
+          </label>
 
-      <label class="field">
-        <span>主题色</span>
-        <input id="accentColor" type="color" value="#7895a3">
-      </label>
+          <label class="field">
+            <span>品牌标语</span>
+            <input id="brandTagline" type="text" value="关于 AI、工具与更好工作的冷静观察。">
+          </label>
+        </div>
 
-      <label class="field">
-        <span>正文字号</span>
-        <input id="fontSize" type="range" min="14" max="20" value="16">
-      </label>
+        <div class="settings-card">
+          <div class="settings-card-title">版式微调</div>
+          <label class="field">
+            <span>正文字号</span>
+            <input id="fontSize" type="range" min="14" max="20" value="16">
+          </label>
 
-      <label class="field">
-        <span>行距</span>
-        <input id="lineHeight" type="range" min="1.6" max="2.2" step="0.05" value="1.9">
-      </label>
+          <label class="field">
+            <span>行距比例</span>
+            <input id="lineHeight" type="range" min="1.6" max="2.2" step="0.05" value="1.9">
+          </label>
 
-      <label class="field grow">
-        <span>自定义 CSS</span>
-        <textarea id="customCss" spellcheck="false"></textarea>
-      </label>
+          <label class="field grow">
+            <span>自定义 CSS</span>
+            <textarea id="customCss" spellcheck="false" placeholder="在此覆盖或添加自定义 CSS 规则..."></textarea>
+          </label>
+        </div>
+      </div>
     </aside>
   </main>
 
